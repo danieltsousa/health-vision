@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Médico - HealthVision</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+   /* ===================================================
+   PAINEL MÉDICO - ALINHADO AO TEMA BASE (CLEAN GREEN)
+   =================================================== */
+
+/* Header da Seção Médica */
+.header-medico {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+/* Botão Destaque da TV (Cor Oliva/Dourada da Marca) */
+.btn-abrir-tv {
+  width: 100%;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #7a7029;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-abrir-tv:hover {
+  background-color: #5f571f;
+}
+
+.btn-abrir-tv:active {
+  transform: translateY(1px);
+}
+
+/* Container do Consultório */
+.consultorio-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  background: #ffffff;
+  padding: 16px 20px;
+  border: 1px solid #e7ded5;
+  border-left: 5px solid #014227;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(1, 66, 39, 0.06);
+}
+
+.consultorio-input label {
+  margin: 0;
+  color: #014227;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.consultorio-input input {
+  width: 80px;
+  min-height: 48px;
+  text-align: center;
+  font-size: 16px; /* Evita zoom automático no Safari/Mobile */
+  font-weight: 700;
+  color: #222222;
+  border: 1px solid #d8cec4;
+  border-radius: 4px;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.consultorio-input input:focus {
+  border-color: #014227;
+  box-shadow: 0 0 0 3px rgba(1, 66, 39, 0.10);
+}
+
+.consultorio-input span {
+  color: #ffffff;
+  font-size: 0.85rem;
+}
+
+/* Botão de Chamada na TV */
+.btn-tv {
+  width: 100%;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #014227;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-tv:hover {
+  background-color: #025b36;
+}
+
+.btn-tv:active {
+  transform: translateY(1px);
+}
+
+/* Ações do Card de Paciente */
+.card-acoes {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.card-acoes button {
+  margin-top: 0;
+}
+
+.btn-atender {
+  width: 100%;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #7a7029;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-atender:hover {
+  background-color: #5f571f;
+}
+
+.btn-atender:active {
+  transform: translateY(1px);
+}
+
+.btn-salvar-consulta {
+  width: 100%;
+  min-height: 50px;
+  margin-top: 16px;
+  background-color: #014227;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-salvar-consulta:hover {
+  background-color: #025b36;
+}
+
+.btn-salvar-consulta:active {
+  transform: translateY(1px);
+}
+
+/* Divisor de Seção */
+hr.divisor {
+  border: none;
+  border-top: 1px solid #e7ded5;
+  margin: 28px 0;
+}
+
+/* Ajustes do Card Amarelo */
+.card.status-amarelo {
+  background-color: #d97706 !important;
+  border: 1px solid #d97706 !important;
+  color: #000000 !important;
+}
+
+.card.status-amarelo h3,
+.card.status-amarelo p,
+.card.status-amarelo b {
+  color: #040404 !important;
+}
+
+/* Media Queries para Telas Maiores (Desktop e Tablet) */
+@media (min-width: 600px) {
+  .btn-abrir-tv,
+  .btn-tv,
+  .btn-atender {
+    width: auto;
+  }
+}
+  </style>
+</head>
+<body>
+
+  <!-- Conteúdo Principal -->
+  <main class="container conteudo-principal">
+
+    <!-- Cabeçalho -->
+    <div class="header-medico">
+      <h1>🩺 Painel Médico</h1>
+      <button class="btn-abrir-tv" onclick="window.open('tv.html','_blank')">📺 Abrir Tela da TV</button>
+    </div>
+
+    <!-- Campo do Consultório -->
+    <div class="consultorio-input">
+      <label for="consultorio-num">Meu Consultório:</label>
+      <input type="text" id="consultorio-num" value="01">
+      <span>Este número será exibido na TV ao chamar o paciente.</span>
+    </div>
+
+    <h2>Fila de Pacientes (Triagem)</h2>
+    <div id="triagens" class="tiles-grid"></div>
+
+    <hr class="divisor">
+
+    <h2>Prontuário / Atendimento</h2>
+
+    <div class="tiles-grid">
+      
+      <!-- Paciente selecionado -->
+      <div class="tile tile-white">
+        <label for="paciente">Paciente</label>
+        <input id="paciente" placeholder="Selecione na fila acima..." readonly>
+      </div>
+
+      <!-- Diagnóstico -->
+      <div class="tile tile-white">
+        <label for="diagnostico">Diagnóstico</label>
+        <input id="diagnostico" placeholder="Digite o diagnóstico...">
+      </div>
+
+      <!-- Medicação -->
+      <div class="tile tile-white">
+        <label for="medicacao">Medicação Prescrita</label>
+        <select id="medicacao">
+          <option value="">Selecione a medicação</option>
+        </select>
+      </div>
+
+      <!-- Observações -->
+      <div class="tile tile-white tile-large">
+        <label for="obs">Observações Médicas</label>
+        <textarea id="obs" placeholder="Observações e conduta médica..."></textarea>
+      </div>
+
+    </div>
+
+    <button onclick="salvar()" class="tile tile-button tile-green btn-salvar-consulta">
+      Salvar Atendimento
+    </button>
+
+  </main>
+
+  <!-- Rodapé Fixo com a Logo -->
+  <footer class="rodape-sistema">
+    <div class="rodape-conteudo">
+      <img src="img/healthvision-logo.png" alt="HealthVision Logo" class="logo-rodape">
+      <span class="rodape-texto">© 2026 HealthVision Hospitalar</span>
+    </div>
+  </footer>
+
+<script>
+let triagensCarregadas = [];
+
+function carregar() {
+  fetch("/triagens")
+    .then(r => r.json())
+    .then(data => {
+      triagensCarregadas = data;
+
+      const div = document.getElementById("triagens");
+      div.innerHTML = "";
+
+      if (data.length === 0) {
+        div.innerHTML = "<p style='color:#7a7029; text-align:center; grid-column: 1/-1;'>Nenhum paciente na fila de espera.</p>";
+        return;
+      }
+
+      data.forEach((t, index) => {
+        // Mapeia o nível de risco para as classes de status
+        let classeRisco = "status-verde";
+        if (t.risco && t.risco.toLowerCase().includes("amarel")) classeRisco = "status-amarelo";
+        if (t.risco && t.risco.toLowerCase().includes("vermelh")) classeRisco = "status-vermelho";
+
+        div.innerHTML += `
+          <div class="card ${classeRisco}">
+            <h3>${t.nome}</h3>
+            <p><b>Sintoma:</b> ${t.sintoma || "Não informado"}</p>
+            <p><b>Temperatura:</b> ${t.temperatura || "Não informada"}°C</p>
+            <p><b>Alergia:</b> ${t.alergia || "Nenhuma"}</p>
+            <p><b>Observação:</b> ${t.observacao || "Nenhuma"}</p>
+            <div class="card-acoes">
+              <button class="btn-atender" onclick="selecionar(${index})">Atender</button>
+              <button class="btn-tv" onclick="chamarNaTV('${t.nome}')">📺 Chamar na TV</button>
+            </div>
+          </div>
+        `;
+      });
+    });
+}
+
+function chamarNaTV(nome) {
+  const consultorio = document.getElementById("consultorio-num").value || "01";
+  fetch("/tv/chamar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      localTipo: "CONSULTÓRIO",
+      localNumero: consultorio,
+      paciente: nome
+    })
+  })
+  .then(r => r.json())
+  .then(() => {
+    alert("✅ " + nome + " foi chamado na TV para o Consultório " + consultorio + "!");
+  });
+}
+
+function selecionar(index) {
+  const t = triagensCarregadas[index];
+  document.getElementById("paciente").value = t.nome;
+  document.getElementById("obs").value = t.observacao || "";
+
+  if (t.alergia && t.alergia !== "Nenhuma") {
+    alert("⚠️ Paciente possui alergia: " + t.alergia);
+  }
+}
+
+function carregarMedicacoes() {
+  fetch("/lista-medicacoes")
+    .then(r => r.json())
+    .then(data => {
+      const select = document.getElementById("medicacao");
+      select.innerHTML = `<option value="">Selecione a medicação</option>`;
+      data.forEach(med => {
+        const option = document.createElement("option");
+        option.value = med;
+        option.textContent = med;
+        select.appendChild(option);
+      });
+    });
+}
+
+function salvar() {
+  const paciente = document.getElementById("paciente").value;
+  const diagnostico = document.getElementById("diagnostico").value;
+  const medicacao = document.getElementById("medicacao").value;
+  const obs = document.getElementById("obs").value;
+
+  if (!paciente) { alert("Selecione um paciente clicando em Atender."); return; }
+  if (!medicacao) { alert("Selecione uma medicação."); return; }
+
+  fetch("/consulta", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ paciente, diagnostico, medicacao, obs })
+  })
+  .then(r => r.json())
+  .then(() => {
+    alert("Consulta salva com sucesso!");
+    document.getElementById("paciente").value = "";
+    document.getElementById("diagnostico").value = "";
+    document.getElementById("medicacao").value = "";
+    document.getElementById("obs").value = "";
+    carregar(); // Recarrega a fila
+  });
+}
+
+carregar();
+carregarMedicacoes();
+
+// Atualiza a lista automaticamente a cada 10 segundos
+setInterval(carregar, 10000);
+</script>
+
+</body>
+</html>

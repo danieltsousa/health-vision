@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmácia - HealthVision</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <main class="container conteudo-principal">
+    <h1>💊 Dispensa de Medicamentos</h1>
+
+    <div class="tiles-grid" id="lista-prescricoes"></div>
+  </main>
+
+  <footer class="rodape-sistema">
+    <div class="rodape-conteudo">
+      <img src="img/healthvision-logo.png" alt="HealthVision Logo" class="logo-rodape">
+      <span class="rodape-texto">© 2026 HealthVision Hospitalar</span>
+    </div>
+  </footer>
+
+  <script>
+    function carregarPrescricoes() {
+      fetch("/farmacia/prescricoes")
+        .then(r => r.json())
+        .then(data => {
+          const div = document.getElementById("lista-prescricoes");
+          div.innerHTML = "";
+
+          if (data.length === 0) {
+            div.innerHTML = "<p style='color:#7a7029; grid-column: 1/-1;'>Nenhuma prescrição pendente.</p>";
+            return;
+          }
+
+          data.forEach(p => {
+            const entregue = p.statusMedicacao === "ENTREGUE";
+            div.innerHTML += `
+              <div class="tile tile-white" style="border-left: 5px solid ${entregue ? '#28a745' : '#7a7029'};">
+                <h3>Paciente: ${p.paciente}</h3>
+                <p><b>Medicação:</b> ${p.medicacao}</p>
+                <p><b>Observações:</b> ${p.obs || 'Sem observações'}</p>
+                <p><b>Status:</b> ${entregue ? '✅ Entregue' : '⏳ Pendente'}</p>
+                ${!entregue ? `<button class="tile tile-button tile-green" style="min-height: 40px; margin-top: 10px;" onclick="entregar(${p.id})">Confirmar Entrega</button>` : ''}
+              </div>
+            `;
+          });
+        });
+    }
+
+    function entregar(id) {
+      fetch("/farmacia/entregar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      })
+      .then(r => r.json())
+      .then(() => {
+        alert("Medicação entregue com sucesso!");
+        carregarPrescricoes();
+      });
+    }
+
+    carregarPrescricoes();
+    setInterval(carregarPrescricoes, 5000);
+  </script>
+</body>
+</html>

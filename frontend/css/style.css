@@ -1,0 +1,348 @@
+/* ===================================================
+   1. RESET GLOBAL & TEMA BASE (CLEAN GREEN)
+   =================================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #f8f2ec;
+  color: #222222;
+  min-height: 100vh;
+  padding: 16px 12px;
+  line-height: 1.5;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Tipografia */
+h1, h2, h3 {
+  color: #014227;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+h1 { 
+  font-size: clamp(20px, 4vw, 28px); 
+  margin-bottom: 20px; 
+}
+
+h2 { 
+  font-size: clamp(16px, 3vw, 22px); 
+  margin-bottom: 15px; 
+}
+
+h3 { 
+  font-size: 1.1rem; 
+  margin-bottom: 10px; 
+}
+
+p {
+  color: #6b625b;
+  font-size: 0.95rem;
+}
+
+/* ===================================================
+   2. CABEÇALHOS & NAVEGAÇÃO
+   =================================================== */
+header.cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid #e7ded5;
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 15px rgba(1, 66, 39, 0.05);
+}
+
+header.cabecalho .user-info {
+  font-size: 0.9rem;
+  color: #014227;
+  font-weight: 700;
+}
+
+/* ===================================================
+   3. GRID & TILES (BLOCO RESPONSIVO)
+   =================================================== */
+.tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.tile {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border: 1px solid #e7ded5;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(1, 66, 39, 0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  min-height: 110px;
+}
+
+.tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(1, 66, 39, 0.12);
+}
+
+.tile h3, .tile p {
+  color: #ffffff;
+}
+
+/* Variações de Cores dos Tiles */
+.tile-blue     { background-color: #014227; color: #fff; }
+.tile-darkblue { background-color: #002b19; color: #fff; }
+.tile-purple   { background-color: #4a3b69; color: #fff; }
+.tile-green    { background-color: #025b36; color: #fff; }
+.tile-orange   { background-color: #d97706; color: #fff; }
+.tile-red      { background-color: #b42318; color: #fff; }
+.tile-dark     { background-color: #2b2b2b; color: #fff; }
+
+/* ===================================================
+   4. FORMULÁRIOS & ENTRADAS DE DADOS
+   =================================================== */
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+label {
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #014227;
+  letter-spacing: 0.3px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #d8cec4;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #222222;
+  font-size: 16px; /* Evita zoom automático no Safari iOS */
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9b938c;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #014227;
+  box-shadow: 0 0 0 3px rgba(1, 66, 39, 0.10);
+  background: #ffffff;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+option {
+  background: #ffffff;
+  color: #222222;
+}
+
+/* ===================================================
+   5. BOTÕES
+   =================================================== */
+button,
+.btn-metro {
+  width: 100%;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s, opacity 0.2s;
+  color: #ffffff;
+  background-color: #014227;
+}
+
+button:hover,
+.btn-metro:hover {
+  background-color: #025b36;
+}
+
+button:active,
+.btn-metro:active {
+  transform: translateY(1px);
+}
+
+.btn-danger  { background-color: #b42318; }
+.btn-warning { background-color: #d97706; color: #fff; }
+.btn-success { background-color: #025b36; }
+
+button.tile-button {
+  min-height: 70px;
+  font-size: 1rem;
+}
+
+/* ===================================================
+   6. TABELAS & LISTAS
+   =================================================== */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #ffffff;
+  border: 1px solid #e7ded5;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(1, 66, 39, 0.05);
+  margin-top: 15px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px; /* Garante rolagem horizontal fluida em telas muito pequenas */
+}
+
+th, td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid #eee6df;
+  font-size: 0.9rem;
+}
+
+th {
+  background-color: #f2ebe3;
+  color: #014227;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+tr:hover {
+  background-color: #faf6f2;
+}
+
+/* Badges de Risco/Status */
+.badge {
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.status-verde    { background-color: #014227; color: #fff; }
+.status-amarelo  { background-color: #d97706; color: #fff; }
+.status-vermelho { background-color: #b42318; color: #fff; }
+
+/* ===================================================
+   7. ESPECÍFICO: PAINEL DA TV / CHAMADA DE SENHAS
+   =================================================== */
+.tv-display {
+  text-align: center;
+  padding: 28px 16px;
+  background-color: #ffffff;
+  border: 2px solid #014227;
+  border-radius: 8px;
+  box-shadow: 0 12px 35px rgba(1, 66, 39, 0.12);
+  margin-bottom: 24px;
+}
+
+.tv-display .paciente-chamado {
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-weight: 700;
+  color: #014227;
+  margin: 10px 0;
+  text-transform: uppercase;
+  word-break: break-word;
+}
+
+.tv-display .local-chamado {
+  font-size: clamp(1.2rem, 5vw, 2rem);
+  color: #d97706;
+  font-weight: 700;
+}
+
+/* ===================================================
+   8. ESPECÍFICO: LOGS DE AUDITORIA (ADMIN)
+   =================================================== */
+.log-box {
+  font-family: 'Consolas', 'Courier New', monospace;
+  background-color: #012415;
+  color: #34d399;
+  padding: 14px;
+  height: 250px;
+  border-radius: 6px;
+  overflow-y: auto;
+  border: 1px solid #e7ded5;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.log-box div {
+  margin-bottom: 6px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+  padding-bottom: 4px;
+  word-break: break-all;
+}
+
+/* ===================================================
+   9. ADAPTAÇÕES PARA TELAS MAIORES (TABLETS E DESKTOPS)
+   =================================================== */
+@media (min-width: 600px) {
+  button,
+  .btn-metro {
+    width: auto;
+  }
+
+  .tiles-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .tile-large { grid-column: span 2; }
+  .tile-full  { grid-column: 1 / -1; }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 12px 8px;
+  }
+
+  header.cabecalho {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px;
+  }
+}

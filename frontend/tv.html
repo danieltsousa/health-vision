@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Mídia Indoor - HealthVision</title>
+  <style>
+    /* Reset e Tipografia */
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    }
+
+    /* Fundo creme característico da marca */
+    body {
+      background-color: #f8f2ec; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .tv-container {
+      display: flex;
+      width: 96vw;
+      height: 92vh;
+      gap: 15px;
+    }
+
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      width: 35%;
+      gap: 15px;
+    }
+
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      width: 65%;
+      gap: 15px;
+    }
+
+    /* Estilo Base dos Tiles (Metro UI) */
+    .box {
+      border: none;
+      border-radius: 0; /* Cantos retos estilo Metro */
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(1, 66, 39, 0.12);
+      position: relative;
+    }
+
+    .box-title {
+      color: #ffffff;
+      font-size: 2vw;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    /* Local (Guichê / Consultório) - Dourado Oliva */
+    .local-box { 
+      flex: 1; 
+      background-color: #7a7029; 
+    }
+    
+    .local-number {
+      color: #ffffff;
+      font-size: 9.5vw;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    /* Histórico - Tom Creme Suave com Texto Verde */
+    .history-box {
+      flex: 1;
+      background-color: #efe6dc;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 20px 25px;
+    }
+    
+    .history-box .box-title { 
+      color: #014227;
+      font-size: 1.6vw; 
+      align-self: flex-start; 
+      border-bottom: 2px solid #014227;
+      width: 100%;
+      text-align: left;
+      padding-bottom: 6px;
+    }
+
+    #history-list {
+      list-style: none;
+      width: 100%;
+      color: #014227;
+      font-size: 1.4vw;
+      font-weight: 600;
+      text-align: left;
+      margin-top: 10px;
+    }
+
+    #history-list li {
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(1, 66, 39, 0.2);
+      padding-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Nome do Paciente - Verde Escuro HealthVision */
+    .patient-box { 
+      flex: 3; 
+      background-color: #014227; 
+    }
+
+    .patient-name {
+      color: #ffffff;
+      font-size: 6.5vw;
+      font-weight: bold;
+      line-height: 1.2;
+      word-break: break-word;
+      text-transform: uppercase;
+    }
+
+    /* Logo / Rodapé - Bloco Branco */
+    .logo-box { 
+      flex: 1; 
+      background-color: #ffffff; 
+      padding: 15px;
+    }
+
+    .logo-img {
+      max-height: 80%;
+      max-width: 90%;
+      object-fit: contain;
+    }
+
+    /* Animação do Flash quando o paciente é chamado */
+    @keyframes metro-flash {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.99); }
+    }
+    
+    .flash { 
+      animation: metro-flash 0.4s ease 3; 
+    }
+  </style>
+</head>
+<body>
+
+<div class="tv-container">
+  <!-- Painel Esquerdo -->
+  <div class="left-panel">
+    <div class="box local-box">
+      <div class="box-title" id="local-tipo">GUICHÊ</div>
+      <div class="local-number" id="local-numero">--</div>
+    </div>
+    <div class="box history-box">
+      <div class="box-title">ÚLTIMAS CHAMADAS</div>
+      <ul id="history-list"></ul>
+    </div>
+  </div>
+
+  <!-- Painel Direito -->
+  <div class="right-panel">
+    <div class="box patient-box">
+      <div class="box-title">PACIENTE</div>
+      <div class="patient-name" id="patient-name">AGUARDANDO...</div>
+    </div>
+    
+    <!-- Box com a Imagem da Logo -->
+    <div class="box logo-box">
+      <img src="image.png" alt="HealthVision" class="logo-img">
+    </div>
+  </div>
+</div>
+
+<script>
+let ultimoId = null;
+
+function atualizar() {
+  fetch("/tv/chamada")
+    .then(r => r.json())
+    .then(data => {
+      const chamada = data.chamada;
+      const historico = data.historico || [];
+
+      if (chamada) {
+        document.getElementById("local-tipo").innerText = chamada.localTipo || "GUICHÊ";
+        document.getElementById("local-numero").innerText = chamada.localNumero || "--";
+        document.getElementById("patient-name").innerText = chamada.paciente || "AGUARDANDO...";
+
+        if (chamada.id !== ultimoId) {
+          ultimoId = chamada.id;
+          const patientBox = document.querySelector(".patient-box");
+          patientBox.classList.remove("flash");
+          void patientBox.offsetWidth; // reflow
+          patientBox.classList.add("flash");
+        }
+      }
+
+      const list = document.getElementById("history-list");
+      list.innerHTML = "";
+      historico.slice(0, 4).forEach(h => {
+        const li = document.createElement("li");
+        const tipo = h.localTipo ? h.localTipo.substring(0,4) : "GUIC";
+        li.innerText = `${tipo}. ${h.localNumero} — ${h.paciente}`;
+        list.appendChild(li);
+      });
+    })
+    .catch(err => console.log("Erro ao buscar chamada:", err));
+}
+
+atualizar();
+setInterval(atualizar, 2000);
+</script>
+
+</body>
+</html>

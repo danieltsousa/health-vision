@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atendimento - HealthVision</title>
+<link rel="stylesheet" href="css/style.css">
+  </style>
+</head>
+<body>
+
+  <!-- Conteúdo Principal -->
+  <main class="container conteudo-principal">
+    <h1>Recepção / Atendimento</h1>
+
+    <form class="form-atendimento" onsubmit="cadastrar(event)">
+      <div class="tiles-grid">
+
+        <!-- Campo Nome -->
+        <div class="tile tile-white">
+          <label for="nome">Nome Completo</label>
+          <input id="nome" placeholder="Digite o nome do paciente..." required>
+        </div>
+
+        <!-- Campo CPF -->
+        <div class="tile tile-white">
+          <label for="cpf">CPF</label>
+          <input id="cpf" placeholder="000.000.000-00" required>
+        </div>
+
+        <!-- Campo Tipo de Atendimento -->
+        <div class="tile tile-white">
+          <label for="tipo">Tipo de Atendimento</label>
+          <select id="tipo" required>
+            <option value="">Selecione...</option>
+            <option value="Convenio">Convênio</option>
+            <option value="Particular">Particular</option>
+          </select>
+        </div>
+
+        <!-- Campo Foto (Convertida para Base64) -->
+        <div class="tile tile-white custom-file-input">
+          <label for="foto">Foto do Paciente / Documento</label>
+          <input type="file" id="foto" accept="image/*">
+        </div>
+
+      </div>
+
+      <button type="submit" class="tile tile-button tile-green btn-cadastrar">
+        Cadastrar e Enviar para Triagem
+      </button>
+    </form>
+  </main>
+
+  <!-- Rodapé Fixo com a Logo -->
+  <footer class="rodape-sistema">
+    <div class="rodape-conteudo">
+      <img src="img/healthvision-logo.png" alt="HealthVision Logo" class="logo-rodape">
+      <span class="rodape-texto">© 2026 HealthVision Hospitalar</span>
+    </div>
+  </footer>
+
+  <script>
+  // Função auxiliar para converter arquivo de imagem em Base64
+  function converterImagemParaBase64(file) {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        resolve(null);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function cadastrar(event) {
+    if (event) event.preventDefault();
+
+    const nomeInput = document.getElementById("nome").value;
+    const cpfInput = document.getElementById("cpf").value;
+    const tipoInput = document.getElementById("tipo").value;
+    const fotoInput = document.getElementById("foto").files[0];
+
+    try {
+      // Converte a foto em string caso o usuário tenha selecionado um arquivo
+      const fotoBase64 = await converterImagemParaBase64(fotoInput);
+
+      const payload = {
+        nome: nomeInput,
+        cpf: cpfInput,
+        tipo: tipoInput,
+        foto: fotoBase64
+      };
+
+      const resposta = await fetch("http://localhost:3000/atendimento", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (resposta.ok) {
+        alert("✅ Paciente cadastrado e enviado para triagem!");
+        // Limpa os campos do formulário
+        document.getElementById("nome").value = "";
+        document.getElementById("cpf").value = "";
+        document.getElementById("tipo").value = "";
+        document.getElementById("foto").value = "";
+      } else {
+        alert("❌ Erro ao cadastrar paciente no servidor.");
+      }
+    } catch (erro) {
+      console.error("Erro no cadastro:", erro);
+      alert("❌ Falha de conexão com o servidor.");
+    }
+  }
+  </script>
+
+</body>
+</html>

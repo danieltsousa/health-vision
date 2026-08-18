@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HealthVision - Painel de Administração</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+    .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .btn-danger { background-color: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+    .btn-warning { background-color: #ffc107; color: #333; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+    .btn-primary { background-color: #0d6efd; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.88rem; }
+    th { background-color: #f4f4f4; }
+    .log-box { font-family: monospace; background: #1e1e1e; color: #00ff00; padding: 10px; height: 250px; overflow-y: auto; border-radius: 5px; font-size: 0.82rem; }
+  </style>
+</head>
+<body>
+
+  <header class="cabecalho">
+    <h1>⚙️ Painel de Administração & Configurações</h1>
+  </header>
+
+  <main class="container">
+    
+    <!-- Ferramentas de Otimização e Manutenção -->
+    <div class="card">
+      <h2>🚀 Manutenção do Sistema</h2>
+      <p>Ações de otimização, correção de incoerências de dados e limpeza.</p>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button class="btn-primary" onclick="Admin.limparOrfãos()">🧹 Limpar Registros Órfãos</button>
+        <button class="btn-warning" onclick="Admin.resetarFilas()">🔄 Resetar Filas de Espera</button>
+        <button class="btn-danger" onclick="Admin.limparLogs()">🗑️ Limpar Logs</button>
+      </div>
+    </div>
+
+    <div class="admin-grid">
+      
+      <!-- Lista Completa de Pacientes -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h2>👥 Pacientes Registrados</h2>
+          <button onclick="Admin.carregarPacientes()">⚡ Atualizar</button>
+        </div>
+        <div style="max-height: 300px; overflow-y: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-pacientes">
+              <!-- Preenchido via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Logs de Auditoria do Sistema -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h2>📜 Logs de Auditoria</h2>
+          <button onclick="Admin.carregarLogs()">⚡ Atualizar</button>
+        </div>
+        <div id="log-list" class="log-box"></div>
+      </div>
+
+    </div>
+
+  </main>
+  
+  <script>
+    const Admin = {
+  // Carrega a lista completa de pacientes
+  async carregarPacientes() {
+    try {
+      const res = await fetch('/api/admin/pacientes');
+      const pacientes = await res.json();
+      const tbody = document.getElementById('tabela-pacientes');
+
+      if (!pacientes.length) {
+        tbody.innerHTML = '<tr><td colspan="5">Nenhum paciente cadastrado.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = pacientes.map(p => `
+        <tr>
+          <td>${p.id}</td>
+          <td>${p.nome}</td>
+          <td>${p.cpf}</td>
+          <td><span class="badge">${p.status || 'Pendente'}</span></td>
+          <td>
+            <button class="btn-danger" style="padding:2px 6px; font-size:0.75rem;" onclick="Admin.deletarPaciente(${p.id})">Excluir</button>
+          </td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      console.error('Erro ao buscar pacientes:', err);
+    }
+  },
+
+  // Exclui um paciente individualmente
+  async deletarPaciente(id) {
+    if (!confirm(`Deseja remover o paciente ID ${id}?`)) return;
+
+    try {
+      const res = await fetch(`/api/admin/paciente/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      alert(data.message || 'Excluído com sucesso');
+      this.carregarPacientes();
+      this.carregarLogs();
+    } catch (err) {
+      alert('Erro ao excluir paciente');
+    }
+  },
+
+  // Carrega os logs de auditoria no painel
+  async carregarLogs() {
+    try {
+      const res = await fetch('/api/logs');
+      const logs = await res.json();
+      const container = document.getElementById('log-list');
+
+      if (!logs.length) {
+        container.innerHTML = '> Nenhum log registrado.';
+        return;
+      }
+
+      container.innerHTML = logs.map(l => {
+        const hora = new Date(l.timestamp).toLocaleTimeString('pt-BR');
+        return `<div>[${hora}] [${l.role.toUpperCase()}] ${l.user}: ${l.message}</div>`;
+      }).join('');
+    } catch (err) {
+      console.error('Erro ao carregar logs:', err);
+    }
+  },
+
+  // Limpa o histórico de logs
+  async limparLogs() {
+    if (!confirm('Deseja apagar todos os logs do sistema?')) return;
+
+    try {
+      await fetch('/api/logs', { method: 'DELETE' });
+      this.carregarLogs();
+    } catch (err) {
+      alert('Erro ao limpar logs');
+    }
+  },
+
+  // Função de otimização do banco
+  async limparOrfãos() {
+    try {
+      const res = await fetch('/api/admin/otimizar', { method: 'POST' });
+      const data = await res.json();
+      alert(data.message);
+      this.carregarLogs();
+    } catch (err) {
+      alert('Erro ao executar otimização.');
+    }
+  },
+
+  // Reseta triagens e filas
+  async resetarFilas() {
+    if (!confirm('ATENÇÃO: Isso irá zerar a fila de espera de todos os atendimentos ativos. Deseja continuar?')) return;
+
+    try {
+      const res = await fetch('/api/admin/resetar-filas', { method: 'POST' });
+      const data = await res.json();
+      alert(data.message);
+      this.carregarPacientes();
+      this.carregarLogs();
+    } catch (err) {
+      alert('Erro ao resetar filas.');
+    }
+  }
+};
+
+// Carrega os dados assim que a página é aberta
+document.addEventListener('DOMContentLoaded', () => {
+  Admin.carregarPacientes();
+  Admin.carregarLogs();
+});
+  </script>
+
+</body>
+</html>
