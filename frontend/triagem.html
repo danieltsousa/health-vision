@@ -89,22 +89,23 @@
   <h3>Formulário de Triagem</h3>
   <input id="nome" placeholder="Nome do paciente">
 
-  <select id="sintoma">
-    <option value="">Selecione o sintoma</option>
-    <option value="dor_leve">Dor leve</option>
-    <option value="resfriado">Resfriado</option>
-    <option value="coriza">Coriza</option>
-    <option value="tosse">Tosse</option>
-    <option value="febre">Febre</option>
-    <option value="vomito">Vômito</option>
-    <option value="diarreia">Diarreia</option>
-    <option value="falta_ar_moderada">Falta de ar moderada</option>
-    <option value="falta_ar_grave">Falta de ar grave</option>
-    <option value="infarto">Suspeita de infarto</option>
-    <option value="avc">Suspeita de AVC</option>
-    <option value="convulsao">Convulsão</option>
-    <option value="hemorragia">Hemorragia</option>
-  </select>
+  <!-- Input com datalist permitindo digitar livremente ou escolher das opções -->
+  <input id="sintoma" list="lista-sintomas" placeholder="Digite ou selecione o sintoma">
+  <datalist id="lista-sintomas">
+    <option value="Dor leve">
+    <option value="Resfriado">
+    <option value="Coriza">
+    <option value="Tosse">
+    <option value="Febre">
+    <option value="Vômito">
+    <option value="Diarreia">
+    <option value="Falta de ar moderada">
+    <option value="Falta de ar grave">
+    <option value="Suspeita de infarto">
+    <option value="Suspeita de AVC">
+    <option value="Convulsão">
+    <option value="Hemorragia">
+  </datalist>
 
   <input id="temp" type="number" placeholder="Temperatura">
   <input id="alergia" placeholder="Alergias">
