@@ -5,13 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Farmácia - HealthVision</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Estilos complementares de otimização */
+    .header-farmacia {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .filtros-container {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-filtro {
+      background: #e2e8f0;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #4a5568;
+      transition: background 0.2s;
+    }
+    .btn-filtro.ativo {
+      background: #3182ce;
+      color: white;
+    }
+    .tile-white {
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+    }
+    .tile-white:hover {
+      transform: translateY(-2px);
+    }
+    .loading-text, .error-text {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 20px;
+      font-weight: bold;
+      color: #718096;
+    }
+    .error-text { color: #e53e3e; }
+  </style>
 </head>
 <body>
 
   <main class="container conteudo-principal">
-    <h1>💊 Dispensa de Medicamentos</h1>
+    <div class="header-farmacia">
+      <h1>💊 Dispensa de Medicamentos</h1>
+      <div class="filtros-container">
+        <button class="btn-filtro ativo" onclick="mudarFiltro('todos', this)">Todas</button>
+        <button class="btn-filtro" onclick="mudarFiltro('pendente', this)">Pendentes</button>
+        <button class="btn-filtro" onclick="mudarFiltro('entregue', this)">Entregues</button>
+      </div>
+    </div>
 
-    <div class="tiles-grid" id="lista-prescricoes"></div>
+    <div class="tiles-grid" id="lista-prescricoes">
+      <div class="loading-text">Carregando prescrições...</div>
+    </div>
   </main>
 
   <footer class="rodape-sistema">
@@ -22,46 +78,87 @@
   </footer>
 
   <script>
+    let dadosGlobais = [];
+    let filtroAtual = 'todos';
+
+    function mudarFiltro(tipo, elemento) {
+      document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('ativo'));
+      elemento.classList.add('ativo');
+      filtroAtual = tipo;
+      renderizarPrescricoes();
+    }
+
     function carregarPrescricoes() {
       fetch("/farmacia/prescricoes")
-        .then(r => r.json())
+        .then(r => {
+          if (!r.ok) throw new Error("Erro ao buscar dados do servidor");
+          return r.json();
+        })
         .then(data => {
+          dadosGlobais = data || [];
+          renderizarPrescricoes();
+        })
+        .catch(err => {
+          console.error(err);
           const div = document.getElementById("lista-prescricoes");
-          div.innerHTML = "";
-
-          if (data.length === 0) {
-            div.innerHTML = "<p style='color:#7a7029; grid-column: 1/-1;'>Nenhuma prescrição pendente.</p>";
-            return;
-          }
-
-          data.forEach(p => {
-            const entregue = p.statusMedicacao === "ENTREGUE";
-            div.innerHTML += `
-              <div class="tile tile-white" style="border-left: 5px solid ${entregue ? '#28a745' : '#7a7029'};">
-                <h3>Paciente: ${p.paciente}</h3>
-                <p><b>Medicação:</b> ${p.medicacao}</p>
-                <p><b>Observações:</b> ${p.obs || 'Sem observações'}</p>
-                <p><b>Status:</b> ${entregue ? '✅ Entregue' : '⏳ Pendente'}</p>
-                ${!entregue ? `<button class="tile tile-button tile-green" style="min-height: 40px; margin-top: 10px;" onclick="entregar(${p.id})">Confirmar Entrega</button>` : ''}
-              </div>
-            `;
-          });
+          div.innerHTML = `<div class="error-text">⚠️ Não foi possível carregar as prescrições no momento.</div>`;
         });
     }
 
+    function renderizarPrescricoes() {
+      const div = document.getElementById("lista-prescricoes");
+      div.innerHTML = "";
+
+      // Filtra os dados de acordo com o botão selecionado
+      const dadosFiltrados = dadosGlobais.filter(p => {
+        const entregue = p.statusMedicacao === "ENTREGUE";
+        if (filtroAtual === 'pendente') return !entregue;
+        if (filtroAtual === 'entregue') return entregue;
+        return true;
+      });
+
+      if (dadosFiltrados.length === 0) {
+        div.innerHTML = `<p style='color:#7a7029; grid-column: 1/-1; text-align:center;'>Nenhuma prescrição encontrada para este filtro.</p>`;
+        return;
+      }
+
+      dadosFiltrados.forEach(p => {
+        const entregue = p.statusMedicacao === "ENTREGUE";
+        div.innerHTML += `
+          <div class="tile tile-white" style="border-left: 5px solid ${entregue ? '#28a745' : '#7a7029'};">
+            <h3>Paciente: ${p.paciente}</h3>
+            <p style="margin: 6px 0;"><b>Medicação:</b> ${p.medicacao}</p>
+            <p style="margin: 6px 0;"><b>Observações:</b> ${p.obs || 'Sem observações'}</p>
+            <p style="margin: 6px 0;"><b>Status:</b> ${entregue ? '✅ Entregue' : '⏳ Pendente'}</p>
+            ${!entregue ? `<button class="tile tile-button tile-green" style="min-height: 40px; margin-top: 12px; width: 100%;" onclick="entregar(${p.id})">Confirmar Entrega</button>` : ''}
+          </div>
+        `;
+      });
+    }
+
     function entregar(id) {
+      if (!confirm("Deseja confirmar a entrega desta medicação?")) return;
+
       fetch("/farmacia/entregar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id })
       })
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error("Erro ao processar entrega");
+        return r.json();
+      })
       .then(() => {
-        alert("Medicação entregue com sucesso!");
+        alert("✅ Medicação entregue com sucesso!");
         carregarPrescricoes();
+      })
+      .catch(err => {
+        alert("❌ Erro ao registrar entrega. Tente novamente.");
+        console.error(err);
       });
     }
 
+    // Inicialização e atualização automática a cada 5 segundos
     carregarPrescricoes();
     setInterval(carregarPrescricoes, 5000);
   </script>
