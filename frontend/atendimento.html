@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Atendimento - HealthVision</title>
-<link rel="stylesheet" href="css/style.css">
-  </style>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -13,10 +12,10 @@
   <main class="container conteudo-principal">
     <h1>Recepção / Atendimento</h1>
 
-    <form class="form-atendimento" onsubmit="cadastrar(event)">
+    <form class="form-atendimento" id="formAtendimento" onsubmit="cadastrar(event)">
       <div class="tiles-grid">
 
-        <!-- Campo Nome -->
+        <!-- Campo Nome Completo -->
         <div class="tile tile-white">
           <label for="nome">Nome Completo</label>
           <input id="nome" placeholder="Digite o nome do paciente..." required>
@@ -26,6 +25,48 @@
         <div class="tile tile-white">
           <label for="cpf">CPF</label>
           <input id="cpf" placeholder="000.000.000-00" required>
+        </div>
+
+        <!-- Campo Sexo -->
+        <div class="tile tile-white">
+          <label for="genero">Sexo</label>
+          <select id="genero" required>
+            <option value="">Selecione...</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Feminino">Feminino</option>
+            <option value="Trans">Trans</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+
+        <!-- Campo Nome da Mãe -->
+        <div class="tile tile-white">
+          <label for="nome_mae">Nome da Mãe</label>
+          <input id="nome_mae" placeholder="Digite o nome da mãe" required>
+        </div>
+
+        <!-- Campo Estado Civil -->
+        <div class="tile tile-white">
+          <label for="estado_civil">Estado Civil</label>
+          <input id="estado_civil" placeholder="Digite Estado Civil">
+        </div>
+
+        <!-- Campo Endereço -->
+        <div class="tile tile-white">
+          <label for="endereco">Endereço</label>
+          <input id="endereco" placeholder="Digite o endereço" required>
+        </div>
+      
+        <!-- Campo Telefone -->
+        <div class="tile tile-white">
+          <label for="telefone">Telefone</label>
+          <input id="telefone" type="tel" placeholder="Digite o telefone" required>
+        </div>
+
+        <!-- Campo Email -->
+        <div class="tile tile-white">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" placeholder="Digite o email">
         </div>
 
         <!-- Campo Tipo de Atendimento -->
@@ -38,7 +79,13 @@
           </select>
         </div>
 
-        <!-- Campo Foto (Convertida para Base64) -->
+        <!-- Campo Data de Nascimento -->
+        <div class="tile tile-white">
+          <label for="data_nascimento">Data de nascimento</label>
+          <input type="date" id="data_nascimento" required onchange="verificarIdade()">
+        </div>
+
+        <!-- Campo Foto -->
         <div class="tile tile-white custom-file-input">
           <label for="foto">Foto do Paciente / Documento</label>
           <input type="file" id="foto" accept="image/*">
@@ -46,7 +93,30 @@
 
       </div>
 
-      <button type="submit" class="tile tile-button tile-green btn-cadastrar">
+      <!-- Seção Dinâmica do Responsável (Menor de 18 Anos) -->
+      <div id="container-responsavel" style="display: none; margin-top: 20px;">
+        <h2 style="font-size: 1.2rem; margin-bottom: 10px; color: #333;">Informações do Responsável (Paciente Menor de Idade)</h2>
+        <div class="tiles-grid">
+          
+          <div class="tile tile-white">
+            <label for="nome_responsavel">Nome do Responsável</label>
+            <input id="nome_responsavel" placeholder="Digite o nome do responsável...">
+          </div>
+
+          <div class="tile tile-white">
+            <label for="cpf_responsavel">CPF do Responsável</label>
+            <input id="cpf_responsavel" placeholder="000.000.000-00">
+          </div>
+
+          <div class="tile tile-white">
+            <label for="parentesco_responsavel">Parentesco / Vínculo</label>
+            <input id="parentesco_responsavel" placeholder="Ex: Mãe, Pai, Tutor legal...">
+          </div>
+
+        </div>
+      </div>
+
+      <button type="submit" class="tile tile-button tile-green btn-cadastrar" style="margin-top: 20px;">
         Cadastrar e Enviar para Triagem
       </button>
     </form>
@@ -61,7 +131,53 @@
   </footer>
 
   <script>
-  // Função auxiliar para converter arquivo de imagem em Base64
+  // Verifica a idade e controla os campos do responsável
+  function verificarIdade() {
+    const dataNascValue = document.getElementById("data_nascimento").value;
+    const containerResp = document.getElementById("container-responsavel");
+
+    if (!dataNascValue) {
+      containerResp.style.display = "none";
+      ajustarCamposResponsavel(false);
+      return;
+    }
+
+    const dataNascimento = new Date(dataNascValue);
+    const hoje = new Date();
+    
+    let idade = hoje.getFullYear() - dataNascimento.getFullYear();
+    const mes = hoje.getMonth() - dataNascimento.getMonth();
+
+    if (mes < 0 || (mes === 0 && hoje.getDate() < (dataNascimento.getDate() + 1))) {
+      idade--;
+    }
+
+    if (idade < 18) {
+      containerResp.style.display = "block";
+      ajustarCamposResponsavel(true);
+    } else {
+      containerResp.style.display = "none";
+      ajustarCamposResponsavel(false);
+    }
+  }
+
+  function ajustarCamposResponsavel(obrigatorio) {
+    const nomeResp = document.getElementById("nome_responsavel");
+    const cpfResp = document.getElementById("cpf_responsavel");
+    const parentescoResp = document.getElementById("parentesco_responsavel");
+
+    nomeResp.required = obrigatorio;
+    cpfResp.required = obrigatorio;
+    parentescoResp.required = obrigatorio;
+
+    if (!obrigatorio) {
+      nomeResp.value = "";
+      cpfResp.value = "";
+      parentescoResp.value = "";
+    }
+  }
+
+  // Converte arquivo de imagem em Base64
   function converterImagemParaBase64(file) {
     return new Promise((resolve, reject) => {
       if (!file) {
@@ -78,20 +194,31 @@
   async function cadastrar(event) {
     if (event) event.preventDefault();
 
-    const nomeInput = document.getElementById("nome").value;
-    const cpfInput = document.getElementById("cpf").value;
-    const tipoInput = document.getElementById("tipo").value;
     const fotoInput = document.getElementById("foto").files[0];
 
     try {
-      // Converte a foto em string caso o usuário tenha selecionado um arquivo
       const fotoBase64 = await converterImagemParaBase64(fotoInput);
 
+      const nomeRespInput = document.getElementById("nome_responsavel").value;
+
+      // Montagem do payload completo com todos os campos do formulário
       const payload = {
-        nome: nomeInput,
-        cpf: cpfInput,
-        tipo: tipoInput,
-        foto: fotoBase64
+        nome: document.getElementById("nome").value,
+        cpf: document.getElementById("cpf").value,
+        genero: document.getElementById("genero").value,
+        nomeMae: document.getElementById("nome_mae").value,
+        estadoCivil: document.getElementById("estado_civil").value,
+        endereco: document.getElementById("endereco").value,
+        telefone: document.getElementById("telefone").value,
+        email: document.getElementById("email").value,
+        tipoAtendimento: document.getElementById("tipo").value,
+        dataNascimento: document.getElementById("data_nascimento").value,
+        foto: fotoBase64,
+        responsavel: nomeRespInput ? {
+          nome: nomeRespInput,
+          cpf: document.getElementById("cpf_responsavel").value,
+          parentesco: document.getElementById("parentesco_responsavel").value
+        } : null
       };
 
       const resposta = await fetch("http://localhost:3000/atendimento", {
@@ -102,11 +229,8 @@
 
       if (resposta.ok) {
         alert("✅ Paciente cadastrado e enviado para triagem!");
-        // Limpa os campos do formulário
-        document.getElementById("nome").value = "";
-        document.getElementById("cpf").value = "";
-        document.getElementById("tipo").value = "";
-        document.getElementById("foto").value = "";
+        document.getElementById("formAtendimento").reset();
+        document.getElementById("container-responsavel").style.display = "none";
       } else {
         alert("❌ Erro ao cadastrar paciente no servidor.");
       }
