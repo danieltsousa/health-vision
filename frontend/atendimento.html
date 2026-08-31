@@ -1,245 +1,284 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atendimento - HealthVision</title>
+  <title>Recepção - Cadastro de Atendimento</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
+    .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .full-width { grid-column: span 2; }
+    label { font-weight: bold; margin-bottom: 5px; display: block; font-size: 14px; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+    .webcam-section { display: flex; flex-direction: column; align-items: center; border: 1px dashed #007bff; padding: 15px; border-radius: 8px; background: #f9fbff; }
+    #video, #canvas-preview { width: 240px; height: 180px; background: #000; border-radius: 6px; object-fit: cover; }
+    #canvas-preview { display: none; }
+    .btn { background: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
+    .btn:hover { background: #0056b3; }
+    .btn-secondary { background: #6c757d; margin-top: 5px; }
+    .btn-secondary:hover { background: #5a6268; }
+    
+    /* Modal de confirmação */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 25px; border-radius: 8px; max-width: 500px; width: 90%; }
+    .modal-content h3 { margin-top: 0; }
+  </style>
 </head>
 <body>
 
-  <!-- Conteúdo Principal -->
-  <main class="container conteudo-principal">
-    <h1>Recepção / Atendimento</h1>
-
-    <form class="form-atendimento" id="formAtendimento" onsubmit="cadastrar(event)">
-      <div class="tiles-grid">
-
-        <!-- Campo Nome Completo -->
-        <div class="tile tile-white">
-          <label for="nome">Nome Completo</label>
-          <input id="nome" placeholder="Digite o nome do paciente..." required>
-        </div>
-
-        <!-- Campo CPF -->
-        <div class="tile tile-white">
-          <label for="cpf">CPF</label>
-          <input id="cpf" placeholder="000.000.000-00" required>
-        </div>
-
-        <!-- Campo Sexo -->
-        <div class="tile tile-white">
-          <label for="genero">Sexo</label>
-          <select id="genero" required>
-            <option value="">Selecione...</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Feminino">Feminino</option>
-            <option value="Trans">Trans</option>
-            <option value="Outro">Outro</option>
-          </select>
-        </div>
-
-        <!-- Campo Nome da Mãe -->
-        <div class="tile tile-white">
-          <label for="nome_mae">Nome da Mãe</label>
-          <input id="nome_mae" placeholder="Digite o nome da mãe" required>
-        </div>
-
-        <!-- Campo Estado Civil -->
-        <div class="tile tile-white">
-          <label for="estado_civil">Estado Civil</label>
-          <input id="estado_civil" placeholder="Digite Estado Civil">
-        </div>
-
-        <!-- Campo Endereço -->
-        <div class="tile tile-white">
-          <label for="endereco">Endereço</label>
-          <input id="endereco" placeholder="Digite o endereço" required>
-        </div>
+<div class="container">
+  <h2>🏥 Recepção - Novo Atendimento</h2>
+  
+  <form id="formAtendimento" onsubmit="abrirModalConfirmacao(event)">
+    <div class="form-grid">
       
-        <!-- Campo Telefone -->
-        <div class="tile tile-white">
-          <label for="telefone">Telefone</label>
-          <input id="telefone" type="tel" placeholder="Digite o telefone" required>
-        </div>
-
-        <!-- Campo Email -->
-        <div class="tile tile-white">
-          <label for="email">E-mail</label>
-          <input id="email" type="email" placeholder="Digite o email">
-        </div>
-
-        <!-- Campo Tipo de Atendimento -->
-        <div class="tile tile-white">
-          <label for="tipo">Tipo de Atendimento</label>
-          <select id="tipo" required>
-            <option value="">Selecione...</option>
-            <option value="Convenio">Convênio</option>
-            <option value="Particular">Particular</option>
-          </select>
-        </div>
-
-        <!-- Campo Data de Nascimento -->
-        <div class="tile tile-white">
-          <label for="data_nascimento">Data de nascimento</label>
-          <input type="date" id="data_nascimento" required onchange="verificarIdade()">
-        </div>
-
-        <!-- Campo Foto -->
-        <div class="tile tile-white custom-file-input">
-          <label for="foto">Foto do Paciente / Documento</label>
-          <input type="file" id="foto" accept="image/*">
-        </div>
-
-      </div>
-
-      <!-- Seção Dinâmica do Responsável (Menor de 18 Anos) -->
-      <div id="container-responsavel" style="display: none; margin-top: 20px;">
-        <h2 style="font-size: 1.2rem; margin-bottom: 10px; color: #333;">Informações do Responsável (Paciente Menor de Idade)</h2>
-        <div class="tiles-grid">
-          
-          <div class="tile tile-white">
-            <label for="nome_responsavel">Nome do Responsável</label>
-            <input id="nome_responsavel" placeholder="Digite o nome do responsável...">
-          </div>
-
-          <div class="tile tile-white">
-            <label for="cpf_responsavel">CPF do Responsável</label>
-            <input id="cpf_responsavel" placeholder="000.000.000-00">
-          </div>
-
-          <div class="tile tile-white">
-            <label for="parentesco_responsavel">Parentesco / Vínculo</label>
-            <input id="parentesco_responsavel" placeholder="Ex: Mãe, Pai, Tutor legal...">
-          </div>
-
+      <!-- Seção Webcam -->
+      <div class="full-width webcam-section">
+        <label>Foto do Paciente</label>
+        <video id="video" autoplay playsinline></video>
+        <img id="canvas-preview" alt="Prévia da Foto">
+        <div style="margin-top: 10px;">
+          <button type="button" class="btn btn-secondary" onclick="capturarFoto()">📸 Capturar Foto</button>
+          <button type="button" class="btn btn-secondary" onclick="reiniciarCamera()" id="btnRecapturar" style="display:none;">🔄 Tirar Outra</button>
         </div>
       </div>
 
-      <button type="submit" class="tile tile-button tile-green btn-cadastrar" style="margin-top: 20px;">
-        Cadastrar e Enviar para Triagem
-      </button>
-    </form>
-  </main>
+      <div>
+        <label for="nome">Nome Completo *</label>
+        <input type="text" id="nome" required>
+      </div>
 
-  <!-- Rodapé Fixo com a Logo -->
-  <footer class="rodape-sistema">
-    <div class="rodape-conteudo">
-      <img src="img/healthvision-logo.png" alt="HealthVision Logo" class="logo-rodape">
-      <span class="rodape-texto">© 2026 HealthVision Hospitalar</span>
+      <div>
+        <label for="cpf">CPF *</label>
+        <input type="text" id="cpf" placeholder="000.000.000-00" required>
+      </div>
+
+      <div>
+        <label for="data_nascimento">Data de Nascimento *</label>
+        <input type="date" id="data_nascimento" onchange="verificarIdade()" required>
+      </div>
+
+      <div>
+        <label for="genero">Gênero *</label>
+        <select id="genero" required>
+          <option value="">Selecione...</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Feminino">Feminino</option>
+          <option value="Outro">Outro</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="nome_mae">Nome da Mãe *</label>
+        <input type="text" id="nome_mae" required>
+      </div>
+
+      <div>
+        <label for="estado_civil">Estado Civil</label>
+        <select id="estado_civil">
+          <option value="Solteiro(a)">Solteiro(a)</option>
+          <option value="Casado(a)">Casado(a)</option>
+          <option value="Divorciado(a)">Divorciado(a)</option>
+          <option value="Viúvo(a)">Viúvo(a)</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="telefone">Telefone / WhatsApp *</label>
+        <input type="tel" id="telefone" placeholder="(00) 00000-0000" required>
+      </div>
+
+      <div>
+        <label for="email">E-mail</label>
+        <input type="email" id="email" placeholder="paciente@email.com">
+      </div>
+
+      <div class="full-width">
+        <label for="endereco">Endereço Completo</label>
+        <input type="text" id="endereco" placeholder="Rua, Número, Bairro, Cidade">
+      </div>
+
+      <div>
+        <label for="tipo">Tipo de Atendimento *</label>
+        <select id="tipo" required>
+          <option value="Convenio">Convênio</option>
+          <option value="Particular">Particular</option>
+          <option value="SUS">SUS</option>
+          <option value="Preferencial">Preferencial</option>
+        </select>
+      </div>
+
+      <!-- Seção do Responsável (Exibida dinamicamente se menor de idade) -->
+      <div id="secao-responsavel" class="full-width" style="display:none; background:#fff3cd; padding:15px; border-radius:5px; border:1px solid #ffeeba;">
+        <h4 style="margin-top:0; color:#856404;">👨‍👧 Dados do Responsável Legal (Menor de Idade)</h4>
+        <div class="form-grid">
+          <div>
+            <label for="nome_responsavel">Nome do Responsável *</label>
+            <input type="text" id="nome_responsavel">
+          </div>
+          <div>
+            <label for="cpf_responsavel">CPF do Responsável *</label>
+            <input type="text" id="cpf_responsavel">
+          </div>
+          <div class="full-width">
+            <label for="parentesco_responsavel">Grau de Parentesco *</label>
+            <select id="parentesco_responsavel">
+              <option value="Pai/Mãe">Pai / Mãe</option>
+              <option value="Tutor Legal">Tutor Legal</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="full-width">
+        <button type="submit" class="btn" style="width:100%;">Finalizar Cadastro e Encaminhar para Triagem</button>
+      </div>
+
     </div>
-  </footer>
+  </form>
+</div>
 
-  <script>
-  // Verifica a idade e controla os campos do responsável
-  function verificarIdade() {
-    const dataNascValue = document.getElementById("data_nascimento").value;
-    const containerResp = document.getElementById("container-responsavel");
+<!-- Modal Confirmar Cadastro -->
+<div id="modalConfirmacao" class="modal">
+  <div class="modal-content">
+    <h3>Confirmação de Cadastro</h3>
+    <p>Confira os dados do paciente antes de confirmar:</p>
+    <div id="resumoCadastro"></div>
+    <div style="margin-top: 20px; display:flex; justify-content:flex-end; gap:10px;">
+      <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+      <button class="btn" onclick="salvarPaciente()">Confirmar e Salvar</button>
+    </div>
+  </div>
+</div>
 
-    if (!dataNascValue) {
-      containerResp.style.display = "none";
-      ajustarCamposResponsavel(false);
-      return;
-    }
+<script>
+let fotoBase64 = null;
+let streamCamera = null;
 
-    const dataNascimento = new Date(dataNascValue);
-    const hoje = new Date();
-    
-    let idade = hoje.getFullYear() - dataNascimento.getFullYear();
-    const mes = hoje.getMonth() - dataNascimento.getMonth();
+// Inicializa a Webcam
+async function iniciarCamera() {
+  try {
+    streamCamera = await navigator.mediaDevices.getUserMedia({ video: true });
+    document.getElementById('video').srcObject = streamCamera;
+  } catch (err) {
+    console.warn("Câmera não acessível ou sem permissão.", err);
+  }
+}
 
-    if (mes < 0 || (mes === 0 && hoje.getDate() < (dataNascimento.getDate() + 1))) {
-      idade--;
-    }
+function capturarFoto() {
+  const video = document.getElementById('video');
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 320;
+  canvas.height = video.videoHeight || 240;
+  
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  
+  fotoBase64 = canvas.toDataURL('image/png');
+  
+  const imgPreview = document.getElementById('canvas-preview');
+  imgPreview.src = fotoBase64;
+  imgPreview.style.display = 'block';
+  video.style.display = 'none';
+  document.getElementById('btnRecapturar').style.display = 'inline-block';
+}
 
-    if (idade < 18) {
-      containerResp.style.display = "block";
-      ajustarCamposResponsavel(true);
-    } else {
-      containerResp.style.display = "none";
-      ajustarCamposResponsavel(false);
-    }
+function reiniciarCamera() {
+  fotoBase64 = null;
+  document.getElementById('canvas-preview').style.display = 'none';
+  document.getElementById('video').style.display = 'block';
+  document.getElementById('btnRecapturar').style.display = 'none';
+}
+
+function verificarIdade() {
+  const dataNascimento = document.getElementById('data_nascimento').value;
+  if (!dataNascimento) return;
+
+  const nasc = new Date(dataNascimento);
+  const hoje = new Date();
+  let idade = hoje.getFullYear() - nasc.getFullYear();
+  const m = hoje.getMonth() - nasc.getMonth();
+  if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) {
+    idade--;
   }
 
-  function ajustarCamposResponsavel(obrigatorio) {
-    const nomeResp = document.getElementById("nome_responsavel");
-    const cpfResp = document.getElementById("cpf_responsavel");
-    const parentescoResp = document.getElementById("parentesco_responsavel");
-
-    nomeResp.required = obrigatorio;
-    cpfResp.required = obrigatorio;
-    parentescoResp.required = obrigatorio;
-
-    if (!obrigatorio) {
-      nomeResp.value = "";
-      cpfResp.value = "";
-      parentescoResp.value = "";
-    }
+  const secaoResp = document.getElementById('secao-responsavel');
+  if (idade < 18) {
+    secaoResp.style.display = 'block';
+  } else {
+    secaoResp.style.display = 'none';
   }
+}
 
-  // Converte arquivo de imagem em Base64
-  function converterImagemParaBase64(file) {
-    return new Promise((resolve, reject) => {
-      if (!file) {
-        resolve(null);
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
-      reader.readAsDataURL(file);
-    });
-  }
+function abrirModalConfirmacao(e) {
+  e.preventDefault();
+  
+  const nome = document.getElementById('nome').value;
+  const cpf = document.getElementById('cpf').value;
+  const tipo = document.getElementById('tipo').value;
 
-  async function cadastrar(event) {
-    if (event) event.preventDefault();
+  document.getElementById('resumoCadastro').innerHTML = `
+    <p><strong>Nome:</strong> ${nome}</p>
+    <p><strong>CPF:</strong> ${cpf}</p>
+    <p><strong>Atendimento:</strong> ${tipo}</p>
+    <p><strong>Foto Capturada:</strong> ${fotoBase64 ? 'Sim' : 'Não'}</p>
+  `;
 
-    const fotoInput = document.getElementById("foto").files[0];
+  document.getElementById('modalConfirmacao').style.display = 'flex';
+}
 
-    try {
-      const fotoBase64 = await converterImagemParaBase64(fotoInput);
+function fecharModal() {
+  document.getElementById('modalConfirmacao').style.display = 'none';
+}
 
-      const nomeRespInput = document.getElementById("nome_responsavel").value;
+function salvarPaciente() {
+  const nomeResp = document.getElementById('nome_responsavel')?.value;
 
-      // Montagem do payload completo com todos os campos do formulário
-      const payload = {
-        nome: document.getElementById("nome").value,
-        cpf: document.getElementById("cpf").value,
-        genero: document.getElementById("genero").value,
-        nomeMae: document.getElementById("nome_mae").value,
-        estadoCivil: document.getElementById("estado_civil").value,
-        endereco: document.getElementById("endereco").value,
-        telefone: document.getElementById("telefone").value,
-        email: document.getElementById("email").value,
-        tipoAtendimento: document.getElementById("tipo").value,
-        dataNascimento: document.getElementById("data_nascimento").value,
-        foto: fotoBase64,
-        responsavel: nomeRespInput ? {
-          nome: nomeRespInput,
-          cpf: document.getElementById("cpf_responsavel").value,
-          parentesco: document.getElementById("parentesco_responsavel").value
-        } : null
-      };
+  const payload = {
+    nome: document.getElementById('nome').value,
+    cpf: document.getElementById('cpf').value,
+    genero: document.getElementById('genero').value,
+    nomeMae: document.getElementById('nome_mae').value,
+    estadoCivil: document.getElementById('estado_civil').value,
+    endereco: document.getElementById('endereco').value,
+    telefone: document.getElementById('telefone').value,
+    email: document.getElementById('email').value,
+    tipo: document.getElementById('tipo').value,
+    dataNascimento: document.getElementById('data_nascimento').value,
+    foto: fotoBase64,
+    responsavel: nomeResp ? {
+      nome: nomeResp,
+      cpf: document.getElementById('cpf_responsavel').value,
+      parentesco: document.getElementById('parentesco_responsavel').value
+    } : null
+  };
 
-      const resposta = await fetch("http://localhost:3000/atendimento", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+  fetch('/atendimento', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Erro ao salvar paciente');
+    return res.json();
+  })
+  .then(data => {
+    alert('✅ Paciente cadastrado com sucesso e encaminhado para a Triagem!');
+    fecharModal();
+    document.getElementById('formAtendimento').reset();
+    reiniciarCamera();
+  })
+  .catch(err => {
+    console.error(err);
+    alert('❌ Erro ao realizar cadastro.');
+  });
+}
 
-      if (resposta.ok) {
-        alert("✅ Paciente cadastrado e enviado para triagem!");
-        document.getElementById("formAtendimento").reset();
-        document.getElementById("container-responsavel").style.display = "none";
-      } else {
-        alert("❌ Erro ao cadastrar paciente no servidor.");
-      }
-    } catch (erro) {
-      console.error("Erro no cadastro:", erro);
-      alert("❌ Falha de conexão com o servidor.");
-    }
-  }
-  </script>
+iniciarCamera();
+</script>
 
 </body>
 </html>
