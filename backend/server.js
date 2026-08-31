@@ -5,7 +5,8 @@ const cors = require("cors");
 
 const app = express();
 
-app.use(express.json());
+// Aumentado o limite do JSON para suportar fotos de perfil enviadas em Base64
+app.use(express.json({ limit: "15mb" }));
 app.use(cors());
 
 app.use(express.static(path.join(__dirname, "../frontend")));
@@ -23,14 +24,17 @@ function readDB() {
       tv_historico: []
     };
   }
-  const db = JSON.parse(fs.readFileSync(DB_FILE));
+  const db = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+  if (!db.pacientes) db.pacientes = [];
+  if (!db.triagens) db.triagens = [];
+  if (!db.consultas) db.consultas = [];
   if (!db.tv_chamada) db.tv_chamada = null;
   if (!db.tv_historico) db.tv_historico = [];
   return db;
 }
 
 function writeDB(data) {
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), "utf-8");
 }
 
 // LOGIN
@@ -49,32 +53,58 @@ app.post("/login", (req, res) => {
   res.json(user);
 });
 
-// ATENDIMENTO - cadastrar paciente
+// ATENDIMENTO / RECEPTOR - cadastrar paciente com NOVOS DADOS
 app.post("/atendimento", (req, res) => {
   const db = readDB();
 
+  const {
+    nome,
+    cpf,
+    tipo,
+    tipoAtendimento,
+    dataNascimento,
+    genero,
+    nomeMae,
+    foto,
+    responsavel
+  } = req.body;
+
+  if (!nome || !cpf) {
+    return res.status(400).json({ erro: "Nome e CPF são obrigatórios." });
+  }
+
+  // Objeto estruturado salvando todas as informações novas
   const paciente = {
     id: Date.now(),
-    nome: req.body.nome,
-    cpf: req.body.cpf,
-    tipo: req.body.tipo,
+    nome: nome.trim(),
+    cpf: cpf.trim(),
+    dataNascimento: dataNascimento || "",
+    genero: genero || "Não informado",
+    nomeMae: nomeMae ? nomeMae.trim() : "",
+    tipoAtendimento: tipoAtendimento || tipo || "Geral",
+    foto: foto || null,
+    responsavel: responsavel ? {
+      nome: responsavel.nome ? responsavel.nome.trim() : "",
+      cpf: responsavel.cpf ? responsavel.cpf.trim() : "",
+      parentesco: responsavel.parentesco || ""
+    } : null,
     status: "triagem",
-    createdAt: new Date()
+    createdAt: new Date().toISOString()
   };
 
   db.pacientes.push(paciente);
   writeDB(db);
 
-  res.json(paciente);
+  res.status(201).json(paciente);
 });
 
-// LISTAR PACIENTES (triagem busca quem foi cadastrado no atendimento)
+// LISTAR PACIENTES
 app.get("/pacientes", (req, res) => {
   const db = readDB();
   res.json(db.pacientes);
 });
 
-// TRIAGEM
+// TRIAGEM - Atualizada com vínculo de pacienteId
 app.post("/triagem", (req, res) => {
   const db = readDB();
 
@@ -90,20 +120,21 @@ app.post("/triagem", (req, res) => {
 
   const triagem = {
     id: Date.now(),
+    pacienteId: req.body.pacienteId || null,
     nome: req.body.nome,
     sintoma: req.body.sintoma,
     temperatura: req.body.temperatura,
-    alergia: req.body.alergia,
+    alergia: req.body.alergia ? req.body.alergia.trim().toLowerCase() : "nenhuma",
     observacao: req.body.observacao,
     risco,
     status: "aguardando_medico",
-    createdAt: new Date()
+    createdAt: new Date().toISOString()
   };
 
   db.triagens.push(triagem);
   writeDB(db);
 
-  res.json(triagem);
+  res.status(201).json(triagem);
 });
 
 // LISTAR TRIAGENS
@@ -112,10 +143,7 @@ app.get("/triagens", (req, res) => {
   res.json(db.triagens);
 });
 
-// ============ MÍDIA INDOOR - TV ============
-
-// Função criada para enviar a chamada do paciente para a tela da TV.
-// Serve para triagem chamar o paciente no guichê e para o médico chamar no consultório.
+// MÍDIA INDOOR - TV
 app.post("/tv/chamar", (req, res) => {
   const db = readDB();
 
@@ -135,8 +163,6 @@ app.post("/tv/chamar", (req, res) => {
   res.json(chamada);
 });
 
-// Função criada para consultar a chamada atual e o histórico que será exibido na TV.
-// Essa rota é usada para atualizar a tela automaticamente a cada poucos segundos.
 app.get("/tv/chamada", (req, res) => {
   const db = readDB();
   res.json({
@@ -167,62 +193,41 @@ app.post("/consulta", (req, res) => {
 
   const consulta = {
     id: Date.now(),
+    pacienteId: req.body.pacienteId || null,
     paciente: req.body.paciente,
     diagnostico: req.body.diagnostico,
     medicacao: req.body.medicacao,
     obs: req.body.obs,
-    createdAt: new Date()
+    createdAt: new Date().toISOString()
   };
 
   db.consultas.push(consulta);
   writeDB(db);
 
-  res.json(consulta);
+  res.status(201).json(consulta);
 });
 
-// MEDICAÇÕES
+// MEDICAÇÕES / CONSULTAS
 app.get("/medicacoes", (req, res) => {
   const db = readDB();
   res.json(db.consultas);
 });
 
-// ============ ROTA DE LOGIN ATUALIZADA ============
-// Redireciona para a página da farmácia se o tipo for "farmacia"
-app.post("/login", (req, res) => {
-  const db = readDB();
-
-  const user = db.usuarios.find(u =>
-    u.usuario === req.body.usuario &&
-    u.senha === req.body.senha
-  );
-
-  if (!user) {
-    return res.status(401).json({ erro: "Login inválido" });
-  }
-
-  res.json(user);
-});
-
-// ============ MÓDULO FARMÁCIA ============
-
-// Listar prescrições pendentes de entrega
+// MÓDULO FARMÁCIA
 app.get("/farmacia/prescricoes", (req, res) => {
   const db = readDB();
-  // Retorna as consultas que possuem medicação prescrita
   const prescricoes = db.consultas.filter(c => c.medicacao && c.medicacao.trim() !== "");
   res.json(prescricoes);
 });
 
-// Marcar entrega de medicação
 app.post("/farmacia/entregar", (req, res) => {
   const db = readDB();
   const consultaId = req.body.id;
 
-  // Atualiza o status da medicação dentro da consulta
   const consulta = db.consultas.find(c => c.id === Number(consultaId));
   if (consulta) {
     consulta.statusMedicacao = "ENTREGUE";
-    consulta.entregueEm = new Date();
+    consulta.entregueEm = new Date().toISOString();
     writeDB(db);
     return res.json({ sucesso: true, consulta });
   }
