@@ -128,6 +128,22 @@
   <label for="nome">Nome do Paciente</label>
   <input id="nome" placeholder="Nome do paciente" required readonly style="background:#e9ecef;">
 
+  <!-- Exemplo de container no HTML da Triagem -->
+<div class="card-paciente-detalhes">
+  <!-- Exibição da Foto em Base64 -->
+  <div class="foto-container" style="text-align: center; margin-bottom: 15px;">
+    <img id="triagem-foto-paciente" src="" alt="Foto do Paciente" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; display: none; border: 2px solid #ccc;">
+  </div>
+
+  <p><strong>Nome:</strong> <span id="triagem-nome"></span></p>
+  <p><strong>CPF:</strong> <span id="triagem-cpf"></span></p>
+  <p><strong>Data de Nasc.:</strong> <span id="triagem-nasc"></span></p>
+  <p><strong>Gênero:</strong> <span id="triagem-genero"></span></p>
+  <p><strong>Mãe:</strong> <span id="triagem-mae"></span></p>
+  <p><strong>Atendimento:</strong> <span id="triagem-tipo"></span></p>
+  <p><strong>Responsável:</strong> <span id="triagem-responsavel"></span></p>
+</div>
+
   <label for="sintoma">Sintomas Apresentados</label>
   <input id="sintoma" list="lista-sintomas" placeholder="Digite ou selecione o sintoma principal" required>
   <datalist id="lista-sintomas">
@@ -164,6 +180,29 @@
 <script>
 let listaPacientesAtuais = [];
 
+// 1. Função isolada para preencher os dados do paciente na tela de Triagem
+function exibirDetalhesTriagem(paciente) {
+  document.getElementById('triagem-nome').textContent = paciente.nome || '-';
+  document.getElementById('triagem-cpf').textContent = paciente.cpf || '-';
+  document.getElementById('triagem-nasc').textContent = paciente.dataNascimento || paciente.nascimento || '-';
+  document.getElementById('triagem-genero').textContent = paciente.genero || '-';
+  document.getElementById('triagem-mae').textContent = paciente.nomeMae || paciente.mae || '-';
+  document.getElementById('triagem-tipo').textContent = paciente.tipoAtendimento || paciente.tipo || '-';
+  document.getElementById('triagem-responsavel').textContent = paciente.responsavelLegal || paciente.responsavel || '-';
+
+  // Carregar e exibir a Foto em Base64 ou URL
+  const imgElement = document.getElementById('triagem-foto-paciente');
+  const fotoSrc = paciente.fotoBase64 || paciente.foto;
+  
+  if (fotoSrc) {
+    imgElement.src = fotoSrc;
+    imgElement.style.display = 'inline-block';
+  } else {
+    imgElement.style.display = 'none';
+  }
+}
+
+// 2. Carregar lista da fila da Recepção
 function carregarPacientes() {
   fetch("/pacientes")
     .then(r => r.json())
@@ -184,14 +223,14 @@ function carregarPacientes() {
         const item = document.createElement("div");
         item.className = "fila-item";
         
-        const fotoSrc = p.foto ? p.foto : 'https://via.placeholder.com/45?text=Foto';
+        const fotoSrc = p.fotoBase64 || p.foto || 'https://via.placeholder.com/45?text=Foto';
 
         item.innerHTML = `
           <div class="fila-item-info">
             <img src="${fotoSrc}" alt="Foto Paciente">
             <div>
               <strong>${p.nome}</strong><br>
-              <small>CPF: ${p.cpf || "—"} | Tipo: ${p.tipo || "—"}</small>
+              <small>CPF: ${p.cpf || "—"} | Tipo: ${p.tipoAtendimento || p.tipo || "—"}</small>
             </div>
           </div>
           <div>
@@ -208,11 +247,16 @@ function carregarPacientes() {
     });
 }
 
+// 3. Ao clicar em Selecionar, atualiza o campo oculto, o input de nome e exibe o card de detalhes
 function selecionarPaciente(id) {
   const paciente = listaPacientesAtuais.find(p => p.id === id);
   if (paciente) {
     document.getElementById("paciente_id").value = paciente.id;
     document.getElementById("nome").value = paciente.nome;
+    
+    // Chama a função para preencher a div de detalhes e foto
+    exibirDetalhesTriagem(paciente);
+    
     document.getElementById("sintoma").focus();
   }
 }
@@ -297,7 +341,7 @@ function salvar() {
 
     alert("✅ Triagem concluída com sucesso! Paciente encaminhado para o médico.");
 
-    // Reseta o formulário
+    // Limpar campos
     document.getElementById("paciente_id").value = "";
     document.getElementById("nome").value = "";
     document.getElementById("sintoma").value = "";
@@ -305,7 +349,10 @@ function salvar() {
     document.getElementById("alergia").value = "";
     document.getElementById("observacao").value = "";
 
-    // Recarrega a fila atualizada
+    // Resetar o container de exibição do paciente
+    exibirDetalhesTriagem({});
+
+    // Recarregar a fila
     carregarPacientes();
   })
   .catch(err => {
@@ -314,7 +361,7 @@ function salvar() {
   });
 }
 
-// Carregamento inicial e loop de atualização
+// Execuções iniciais
 carregarPacientes();
 setInterval(carregarPacientes, 10000);
 
