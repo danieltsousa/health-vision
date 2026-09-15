@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Termo de Alta Médica - HealthVision</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background-color: #f4f6f8;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container-alta {
+      max-width: 750px;
+      margin: 20px auto;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 6px;
+      border: 1px solid #e7ded5;
+      border-left: 5px solid #014227;
+      box-shadow: 0 6px 18px rgba(1, 66, 39, 0.06);
+    }
+
+    .cabecalho-alta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .cabecalho-alta h2 {
+      color: #014227;
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .instituicao-nome {
+      color: #7a7029;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .campo {
+      margin-bottom: 20px;
+    }
+
+    .campo label {
+      display: block;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #014227;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .campo input, 
+    .campo textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d8cec4;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      box-sizing: border-box;
+      color: #222222;
+      background-color: #ffffff;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .campo input:focus, 
+    .campo textarea:focus {
+      border-color: #014227;
+      box-shadow: 0 0 0 3px rgba(1, 66, 39, 0.10);
+    }
+
+    .campo input[readonly] {
+      background-color: #f0f0f0;
+      font-weight: 700;
+      color: #111111;
+      border-color: #ccc;
+    }
+
+    .acoes-alta {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    .btn-acao {
+      width: 100%;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn-acao:active {
+      transform: translateY(1px);
+    }
+
+    .btn-salvar-alta {
+      background-color: #014227;
+      color: #ffffff;
+    }
+
+    .btn-salvar-alta:hover {
+      background-color: #025b36;
+    }
+
+    .btn-voltar {
+      background-color: #6c757d;
+      color: #ffffff;
+    }
+
+    .btn-voltar:hover {
+      background-color: #5a6268;
+    }
+
+    @media (min-width: 600px) {
+      .btn-acao {
+        width: auto;
+      }
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+        padding: 0;
+      }
+
+      .container-alta {
+        box-shadow: none;
+        border: none;
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      .acoes-alta, .rodape-sistema {
+        display: none !important;
+      }
+
+      input, textarea {
+        border: none !important;
+        background: transparent !important;
+        padding: 4px 0 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-alta">
+    <div class="cabecalho-alta">
+      <h2>Termo de Alta Médica</h2>
+      <span class="instituicao-nome">HealthVision Hospitalar</span>
+    </div>
+    <hr style="border: none; border-top: 1px solid #e7ded5; margin-bottom: 24px;">
+
+    <form id="formAlta" onsubmit="confirmarEEmitirAlta(event)">
+      <div class="campo">
+        <label for="paciente">Nome do Paciente</label>
+        <input type="text" id="paciente" readonly>
+      </div>
+
+      <div class="campo">
+        <label for="diagnostico">Diagnóstico de Saída</label>
+        <input type="text" id="diagnostico" required placeholder="Informe o diagnóstico definitivo de alta...">
+      </div>
+
+      <div class="campo">
+        <label for="orientacoes">Orientações Médicas e Prescrição Pós-Alta</label>
+        <textarea id="orientacoes" rows="5" placeholder="Descreva as orientações de conduta, restrições e posologia de medicamentos..." required></textarea>
+      </div>
+
+      <div class="campo">
+        <label for="medico">Médico Responsável (CRM)</label>
+        <input type="text" id="medico" placeholder="Nome do profissional - CRM/UF N°" required>
+      </div>
+
+      <div class="acoes-alta">
+        <button type="submit" class="btn-acao btn-salvar-alta">Emitir Alta e Gerar PDF</button>
+        <button type="button" class="btn-acao btn-voltar" onclick="window.location.href='medico.html'">Retornar ao Painel</button>
+      </div>
+    </form>
+  </div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const triagemId = params.get("id");
+  const pacienteNome = params.get("paciente");
+  const diagnosticoInicial = params.get("diagnostico");
+
+  if (pacienteNome) {
+    document.getElementById("paciente").value = decodeURIComponent(pacienteNome);
+  }
+  if (diagnosticoInicial) {
+    document.getElementById("diagnostico").value = decodeURIComponent(diagnosticoInicial);
+  }
+
+  async function confirmarEEmitirAlta(event) {
+    event.preventDefault();
+
+    const dadosAlta = {
+      triagemId: triagemId,
+      paciente: document.getElementById("paciente").value,
+      diagnostico: document.getElementById("diagnostico").value,
+      orientacoes: document.getElementById("orientacoes").value,
+      medico: document.getElementById("medico").value
+    };
+
+    try {
+      const resposta = await fetch("/alta", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dadosAlta)
+      });
+
+      if (!resposta.ok) {
+        console.warn("Aviso: Servidor retornou status diferente de 200. Prosseguindo em modo simulação.");
+      }
+    } catch (err) {
+      console.warn("Modo de simulação ativo: Servidor Node.js offline ou não encontrado. Gerando documento localmente.", err);
+    }
+
+    // Abre a caixa de impressão/geração de PDF imediatamente após o clique
+    window.print();
+  }
+</script>
+
+</body>
+</html>
