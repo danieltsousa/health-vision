@@ -244,6 +244,19 @@
   </main>
 
   <script>
+
+    function lerFotoEmBase64(fileInput) {
+    return new Promise((resolve) => {
+      const file = fileInput.files[0];
+      if (!file) return resolve(null);
+
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  }
+  
     const formLogin = document.getElementById("form-login");
     const usuarioInput = document.getElementById("usuario");
     const senhaInput = document.getElementById("senha");
@@ -298,23 +311,31 @@
         if (!response.ok) {
           throw new Error(data.mensagem || data.erro || "Usuário ou senha inválidos.");
         }
+switch (data.tipo) {
+  case "triagem":
+    window.location.href = "triagem.html";
+    break;
 
-        switch (data.tipo) {
-          case "triagem":
-            window.location.href = "triagem.html";
-            break;
+  case "medico":
+    window.location.href = "medico.html";
+    break;
 
-          case "medico":
-            window.location.href = "medico.html";
-            break;
+  case "atendimento":
+    window.location.href = "atendimento.html";
+    break;
 
-          case "atendimento":
-            window.location.href = "atendimento.html";
-            break;
+  case "farmacia":
+    window.location.href = "medicacoes.html";
+    break;
 
-          default:
-            throw new Error("O servidor retornou um tipo de usuário inválido.");
-        }
+  // Adicione este caso para tratar utilizadores administradores:
+  case "admin":
+    window.location.href = "admin.html";
+    break;
+
+  default:
+    throw new Error("O servidor retornou um tipo de usuário inválido.");
+}
 
       } catch (error) {
         console.error("Erro no login:", error);
@@ -332,3 +353,4 @@
 
 </body>
 </html>
+
