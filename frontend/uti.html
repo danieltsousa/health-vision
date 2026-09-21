@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de UTIs | HealthVision</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background-color: #f8f2ec; font-family: Arial, sans-serif; padding: 20px; }
+    .grid-leitos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
+    .card-leito { background: #fff; border: 2px solid #e7ded5; border-radius: 8px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .card-leito.ocupado { border-color: #b42318; background-color: #fef2f2; }
+    .card-leito.livre { border-color: #014227; background-color: #f0fdf4; }
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 12px; text-transform: uppercase; margin-bottom: 10px; }
+    .badge-livre { background: #dcfce7; color: #166534; }
+    .badge-ocupado { background: #fee2e2; color: #991b1b; }
+    .btn-anexar { width: 100%; padding: 10px; background-color: #014227; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+    .btn-anexar:hover { background-color: #025b36; }
+    .btn-alta-uti { width: 100%; padding: 10px; background-color: #b42318; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+    .info-paciente-encaminhado { background: #fff; padding: 15px; border-left: 5px solid #8b0000; border-radius: 4px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+  </style>
+</head>
+<body>
+
+  <h1>🏥 Unidade de Terapia Intensiva (UTI)</h1>
+
+  <!-- Painel do Paciente aguardando leito -->
+  <div id="painel-encaminhamento" class="info-paciente-encaminhado" style="display: none;">
+    <h3>Paciente a ser Internado:</h3>
+    <p><b>Nome:</b> <span id="enc-nome">—</span> | <b>Diagnóstico:</b> <span id="enc-diag">—</span></p>
+    <p style="color: #8b0000; font-size: 0.9rem;"><i>Selecione um leito livre abaixo para confirmar a internação.</i></p>
+  </div>
+
+  <h2>Mapa de Leitos UTI</h2>
+  <div id="grid-leitos" class="grid-leitos"></div>
+
+  <script>
+    // Captura os dados passados via URL pelo medico.html
+    const params = new URLSearchParams(window.location.search);
+    const pacienteId = params.get("id");
+    const pacienteNome = params.get("paciente");
+    const diagnostico = params.get("diagnostico");
+
+    if (pacienteNome) {
+      document.getElementById("painel-encaminhamento").style.display = "block";
+      document.getElementById("enc-nome").textContent = pacienteNome;
+      document.getElementById("enc-diag").textContent = diagnostico || "Não informado";
+    }
+
+    async function carregarLeitos() {
+      try {
+        const res = await fetch("/api/uti/leitos");
+        const leitos = await res.json();
+        
+        const grid = document.getElementById("grid-leitos");
+        grid.innerHTML = "";
+
+        leitos.forEach(leito => {
+          const estaOcupado = leito.status === "ocupado";
+          
+          grid.innerHTML += `
+            <div class="card-leito ${estaOcupado ? 'ocupado' : 'livre'}">
+              <span class="status-badge ${estaOcupado ? 'badge-ocupado' : 'badge-livre'}">
+                ${estaOcupado ? 'Ocupado' : 'Livre'}
+              </span>
+              <h3>${leito.nome}</h3>
+              ${estaOcupado ? `
+                <p><b>Paciente:</b> ${leito.paciente}</p>
+                <p><b>Diagnóstico:</b> ${leito.diagnostico}</p>
+                <p><b>Entrada:</b> ${new Date(leito.dataEntrada).toLocaleString('pt-BR')}</p>
+                <button class="btn-alta-uti" onclick="liberarLeito(${leito.id})">Dar Alta / Liberar Leito</button>
+              ` : `
+                <p>Leito disponível para internação.</p>
+                ${pacienteNome ? `
+                  <button class="btn-anexar" onclick="internarNoLeito(${leito.id})">
+                    Anexar ${pacienteNome} Aqui
+                  </button>
+                ` : ''}
+              `}
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error("Erro ao carregar leitos:", err);
+      }
+    }
+
+    async function internarNoLeito(leitoId) {
+      const response = await fetch("/api/uti/internar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          leitoId,
+          pacienteId: Number(pacienteId),
+          paciente: pacienteNome,
+          diagnostico
+        })
+      });
+
+      if (response.ok) {
+        alert("✅ Paciente internado na UTI com sucesso!");
+        window.location.href = "uti.html"; // Limpa os parâmetros da URL
+      }
+    }
+
+    async function liberarLeito(leitoId) {
+      if (confirm("Tem certeza que deseja liberar este leito de UTI?")) {
+        await fetch(`/api/uti/liberar/${leitoId}`, { method: "POST" });
+        carregarLeitos();
+      }
+    }
+
+    carregarLeitos();
+  </script>
+</body>
+</html>
