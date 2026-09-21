@@ -314,11 +314,7 @@
   </style>
 </head>
 <body>
-  <header>
-    <h1>Painel de Comando</h1>
-    <p>Demonstração de CRUD Frontend/Backend (Node.js)</p>
-    <button onclick="window.print()" style="margin-top: 1rem; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 8px; border: none; background: rgb(255, 153, 153); color: var(--primary-color);">⬇️ Baixar PDF</button>
-  </header>
+
 
   <main class="container conteudo-principal">
     
@@ -558,21 +554,27 @@ function salvar() {
   if (!diagnostico) { alert("Por favor, preencha o diagnóstico do paciente."); return; }
   if (!medicacao) { alert("Por favor, selecione uma medicação."); return; }
 
+  // Captura o ID da triagem selecionada
+  const triagemId = pacienteSelecionado ? pacienteSelecionado.id : null;
+
   fetch("/consulta", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ 
+      triagemId: triagemId, // ID único do registro na fila
       pacienteId: pacienteId ? Number(pacienteId) : null,
       paciente, 
       diagnostico, 
       medicacao, 
-      obs 
+      obs,
+      status: "finalizado" // Informa ao backend que a consulta foi concluída
     })
   })
   .then(r => r.json())
   .then(() => {
-    alert("✅ Atendimento médico salvo com sucesso e prescrição enviada à Farmácia!");
+    alert("✅ Atendimento médico finalizado com sucesso!");
     
+    // Limpa os campos do formulário
     document.getElementById("paciente_id").value = "";
     document.getElementById("paciente").value = "";
     document.getElementById("diagnostico").value = "";
@@ -580,12 +582,14 @@ function salvar() {
     document.getElementById("obs").value = "";
     document.getElementById("box-resumo-paciente").style.display = "none";
     document.getElementById("btn-alta").style.display = "none";
+    pacienteSelecionado = null;
     
+    // Recarrega a fila para remover o paciente imediatamente da tela
     carregar();
   })
   .catch(err => {
     console.error(err);
-    alert("❌ Erro ao salvar atendimento médico.");
+    alert("❌ Erro ao finalizar atendimento médico.");
   });
 }
 
