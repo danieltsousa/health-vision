@@ -51,7 +51,7 @@
     }
 
     .campo {
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .campo label {
@@ -92,10 +92,32 @@
       border-color: #ccc;
     }
 
+    /* Espaçamento e Bloco de Assinatura */
+    .secao-assinatura {
+      margin-top: 50px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .linha-assinatura {
+      width: 320px;
+      margin: 0 auto 8px auto;
+      border-top: 1px solid #333333;
+    }
+
+    .rotulo-assinatura {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #333333;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
     .acoes-alta {
       display: flex;
       gap: 12px;
-      margin-top: 28px;
+      margin-top: 36px;
       flex-wrap: wrap;
     }
 
@@ -168,6 +190,10 @@
         background: transparent !important;
         padding: 4px 0 !important;
       }
+
+      .secao-assinatura {
+        margin-top: 70px;
+      }
     }
   </style>
 </head>
@@ -178,7 +204,7 @@
       <h2>Termo de Alta Médica</h2>
       <span class="instituicao-nome">HealthVision Hospitalar</span>
     </div>
-    <hr style="border: none; border-top: 1px solid #e7ded5; margin-bottom: 24px;">
+    <hr style="border: none; border-top: 1px solid #e7ded5; margin-bottom: 28px;">
 
     <form id="formAlta" onsubmit="confirmarEEmitirAlta(event)">
       <div class="campo">
@@ -198,7 +224,13 @@
 
       <div class="campo">
         <label for="medico">Médico Responsável (CRM)</label>
-        <input type="text" id="medico" placeholder="Nome do profissional - CRM/UF N°" required>
+        <input type="text" id="medico" placeholder="Nome do profissional - CRM/UF N°" required oninput="atualizarNomeAssinatura()">
+      </div>
+
+      <!-- Bloco de Assinatura com Linha e Espaçamento -->
+      <div class="secao-assinatura">
+        <div class="linha-assinatura"></div>
+        <span id="nome-medico-assinatura" class="rotulo-assinatura">Assinatura e Carimbo do Médico</span>
       </div>
 
       <div class="acoes-alta">
@@ -219,6 +251,16 @@
   }
   if (diagnosticoInicial) {
     document.getElementById("diagnostico").value = decodeURIComponent(diagnosticoInicial);
+  }
+
+  function atualizarNomeAssinatura() {
+    const valorMedico = document.getElementById("medico").value;
+    const rotuloAssinatura = document.getElementById("nome-medico-assinatura");
+    if (valorMedico.trim() !== "") {
+      rotuloAssinatura.textContent = valorMedico + " - Assinatura e Carimbo";
+    } else {
+      rotuloAssinatura.textContent = "Assinatura e Carimbo do Médico";
+    }
   }
 
   async function confirmarEEmitirAlta(event) {
@@ -246,7 +288,6 @@
       console.warn("Modo de simulação ativo: Servidor Node.js offline ou não encontrado. Gerando documento localmente.", err);
     }
 
-    // Abre a caixa de impressão/geração de PDF imediatamente após o clique
     window.print();
   }
 </script>
