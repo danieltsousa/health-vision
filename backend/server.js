@@ -12,30 +12,50 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 const DB_FILE = path.join(__dirname, "db.json");
-
 function readDB() {
+  const defaultDB = {
+    usuarios: [],
+    pacientes: [],
+    triagens: [],
+    consultas: [],
+    altas: [],
+    logs: [],
+    tv_chamada: null,
+    tv_historico: []
+  };
+
+  // 1. Se o ficheiro não existir, devolve a estrutura padrão
   if (!fs.existsSync(DB_FILE)) {
-    return {
-      usuarios: [],
-      pacientes: [],
-      triagens: [],
-      consultas: [],
-      altas: [],
-      logs: [],
-      tv_chamada: null,
-      tv_historico: []
-    };
+    return defaultDB;
   }
-  const db = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
-  if (!db.usuarios) db.usuarios = [];
-  if (!db.pacientes) db.pacientes = [];
-  if (!db.triagens) db.triagens = [];
-  if (!db.consultas) db.consultas = [];
-  if (!db.altas) db.altas = [];
-  if (!db.logs) db.logs = [];
-  if (!db.tv_chamada) db.tv_chamada = null;
-  if (!db.tv_historico) db.tv_historico = [];
-  return db;
+
+  try {
+    const rawData = fs.readFileSync(DB_FILE, "utf-8");
+
+    // 2. Se o ficheiro estiver totalmente vazio ou só com espaços, devolve a estrutura padrão
+    if (!rawData || !rawData.trim()) {
+      return defaultDB;
+    }
+
+    // 3. Tenta interpretar o JSON
+    const db = JSON.parse(rawData);
+
+    // 4. Garante que todas as propriedades existam e sejam do tipo esperado
+    return {
+      usuarios: Array.isArray(db.usuarios) ? db.usuarios : [],
+      pacientes: Array.isArray(db.pacientes) ? db.pacientes : [],
+      triagens: Array.isArray(db.triagens) ? db.triagens : [],
+      consultas: Array.isArray(db.consultas) ? db.consultas : [],
+      altas: Array.isArray(db.altas) ? db.altas : [],
+      logs: Array.isArray(db.logs) ? db.logs : [],
+      tv_chamada: db.tv_chamada !== undefined ? db.tv_chamada : null,
+      tv_historico: Array.isArray(db.tv_historico) ? db.tv_historico : []
+    };
+  } catch (error) {
+    // 5. Se o JSON.parse falhar (ex: ficheiro corrompido ou mal formatado), captura o erro sem derrubar o servidor
+    console.error("Erro ao ler ou interpretar o arquivo DB_FILE:", error.message);
+    return defaultDB;
+  }
 }
 
 function writeDB(data) {
