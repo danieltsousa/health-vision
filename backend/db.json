@@ -25,11 +25,7 @@
       "senha": "123",
       "tipo": "admin"
     },
-    {
-      "usuario": "enf",
-      "senha": "123",
-      "tipo": "triagem"
-    }
+ 
   ],
   {
   "leitosUTI": [
