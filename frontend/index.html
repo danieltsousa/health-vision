@@ -311,32 +311,47 @@
         if (!response.ok) {
           throw new Error(data.mensagem || data.erro || "Usuário ou senha inválidos.");
         }
-switch (data.tipo) {
-  case "triagem":
-    window.location.href = "triagem.html";
-    break;
+// Identifica o tipo do usuário independentemente do nome do campo no backend
+    const tipoBruto = 
+      data.tipo || 
+      data.role || 
+      data.perfil || 
+      data.usuario?.tipo || 
+      data.usuario?.role || 
+      "";
 
-  case "medico":
-    window.location.href = "medico.html";
-    break;
+    const tipoUsuario = String(tipoBruto).trim().toLowerCase();
 
-  case "atendimento":
-    window.location.href = "atendimento.html";
-    break;
+    switch (tipoUsuario) {
+      case "triagem":
+        window.location.href = "triagem.html";
+        break;
 
-  case "farmacia":
-    window.location.href = "medicacoes.html";
-    break;
+      case "medico":
+      case "médico":
+        window.location.href = "medico.html";
+        break;
 
-  // Adicione este caso para tratar utilizadores administradores:
-  case "admin":
-    window.location.href = "admin.html";
-    break;
+      case "atendimento":
+      case "recepcao":
+      case "recepção":
+        window.location.href = "atendimento.html";
+        break;
 
-  default:
-    throw new Error("O servidor retornou um tipo de usuário inválido.");
-}
+      case "farmacia":
+      case "farmácia":
+      case "farmaceutico":
+        window.location.href = "medicacoes.html";
+        break;
 
+      case "admin":
+      case "administrador":
+        window.location.href = "admin.html";
+        break;
+
+      default:
+        throw new Error(`Tipo de usuário "${tipoBruto}" inválido ou não cadastrado.`);
+    }
       } catch (error) {
         console.error("Erro no login:", error);
 
