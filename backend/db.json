@@ -24,17 +24,14 @@
       "usuario": "admin",
       "senha": "123",
       "tipo": "admin"
-    },
- 
-  ]
-  {
+    }
+  ],
   "leitosUTI": [
     { "id": 1, "nome": "Leito UTI 01", "status": "livre" },
     { "id": 2, "nome": "Leito UTI 02", "status": "livre" },
     { "id": 3, "nome": "Leito UTI 03", "status": "livre" },
     { "id": 4, "nome": "Leito UTI 04", "status": "livre" }
-  ]
-},
+  ],
   "logs": [],
   "pacientes": [
     {
@@ -109,14 +106,13 @@
     }
   ],
   "consultas": [
-    {},
     {
       "id": 1789399316575,
       "pacienteId": 1776857571101,
       "paciente": "Emily",
       "diagnostico": "Gripe",
       "medicacao": "Ibuprofeno",
-      "obs": "[Triagem]: Dor ocular forte\n\n[Conduta Médica]:  apresenta necessidade de recuperação",
+      "obs": "[Triagem]: Dor ocular forte\n\n[Conduta Médica]: apresenta necessidade de recuperação",
       "createdAt": "2026-09-14T15:21:56.575Z"
     }
   ],
