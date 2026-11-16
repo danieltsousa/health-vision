@@ -12,50 +12,30 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 const DB_FILE = path.join(__dirname, "db.json");
+
 function readDB() {
-  const defaultDB = {
-    usuarios: [],
-    pacientes: [],
-    triagens: [],
-    consultas: [],
-    altas: [],
-    logs: [],
-    tv_chamada: null,
-    tv_historico: []
-  };
-
-  // 1. Se o ficheiro não existir, devolve a estrutura padrão
   if (!fs.existsSync(DB_FILE)) {
-    return defaultDB;
-  }
-
-  try {
-    const rawData = fs.readFileSync(DB_FILE, "utf-8");
-
-    // 2. Se o ficheiro estiver totalmente vazio ou só com espaços, devolve a estrutura padrão
-    if (!rawData || !rawData.trim()) {
-      return defaultDB;
-    }
-
-    // 3. Tenta interpretar o JSON
-    const db = JSON.parse(rawData);
-
-    // 4. Garante que todas as propriedades existam e sejam do tipo esperado
     return {
-      usuarios: Array.isArray(db.usuarios) ? db.usuarios : [],
-      pacientes: Array.isArray(db.pacientes) ? db.pacientes : [],
-      triagens: Array.isArray(db.triagens) ? db.triagens : [],
-      consultas: Array.isArray(db.consultas) ? db.consultas : [],
-      altas: Array.isArray(db.altas) ? db.altas : [],
-      logs: Array.isArray(db.logs) ? db.logs : [],
-      tv_chamada: db.tv_chamada !== undefined ? db.tv_chamada : null,
-      tv_historico: Array.isArray(db.tv_historico) ? db.tv_historico : []
+      usuarios: [],
+      pacientes: [],
+      triagens: [],
+      consultas: [],
+      altas: [],
+      logs: [],
+      tv_chamada: null,
+      tv_historico: []
     };
-  } catch (error) {
-    // 5. Se o JSON.parse falhar (ex: ficheiro corrompido ou mal formatado), captura o erro sem derrubar o servidor
-    console.error("Erro ao ler ou interpretar o arquivo DB_FILE:", error.message);
-    return defaultDB;
   }
+  const db = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+  if (!db.usuarios) db.usuarios = [];
+  if (!db.pacientes) db.pacientes = [];
+  if (!db.triagens) db.triagens = [];
+  if (!db.consultas) db.consultas = [];
+  if (!db.altas) db.altas = [];
+  if (!db.logs) db.logs = [];
+  if (!db.tv_chamada) db.tv_chamada = null;
+  if (!db.tv_historico) db.tv_historico = [];
+  return db;
 }
 
 function writeDB(data) {
@@ -211,41 +191,86 @@ app.get("/tv/chamada", (req, res) => {
   });
 });
 
-// LISTA DE MEDICAÇÕES
-app.get("/lista-medicacoes", (req, res) => {
-  res.json([
-    "Dipirona",
-    "Paracetamol",
-    "Ibuprofeno",
-    "Amoxicilina",
-    "Azitromicina",
-    "Loratadina",
-    "Omeprazol",
-    "Buscopan",
-    "Dramin",
-    "Soro fisiológico"
-  ]);
+// ==========================================
+// ROTAS DE MEDICAMENTOS / FARMÁCIA
+// ==========================================
+
+// 1. Listar todo o estoque (para a Farmácia e sugestões do Médico)
+app.get("/api/farmacia/estoque", async (req, res) => {
+  const db = await readDB();
+  res.json(db.estoqueMedicamentos || []);
 });
 
-// CONSULTA
-app.post("/consulta", (req, res) => {
-  const db = readDB();
+// 2. Cadastrar novo medicamento (Admin ou Farmacêutico)
+app.post("/api/admin/farmacia/medicamento", async (req, res) => {
+  const db = await readDB();
+  const { nome, principioAtivo, categoria, apresentacao, lote, validade, quantidade, controleEspecial, portaria344 } = req.body;
 
-  const consulta = {
-    id: Date.now(),
-    pacienteId: req.body.pacienteId || null,
-    paciente: req.body.paciente,
-    diagnostico: req.body.diagnostico,
-    medicacao: req.body.medicacao,
-    obs: req.body.obs,
-    createdAt: new Date().toISOString()
-  };
+  if (!nome || !lote) return res.status(400).json({ erro: "Nome e lote são obrigatórios." });
 
-  db.consultas.push(consulta);
-  registrarLog(db, "medico", "medico", `Finalizou consulta do paciente: ${consulta.paciente}`);
-  writeDB(db);
+  if (!db.estoqueMedicamentos) db.estoqueMedicamentos = [];
 
-  res.status(201).json(consulta);
+const novoMed = {
+  id: Date.now(),
+  nome: nome.trim(),
+  principioAtivo: principioAtivo ? principioAtivo.trim() : "",
+  categoria: categoria || "Geral",
+  apresentacao: apresentacao || "comp.",
+  lote: lote.trim(),
+  validade: validade || "",
+  quantidade: Number(quantidade) || 0,
+  controleEspecial: Boolean(controleEspecial),
+  portaria344: portaria344 || "Não se aplica"
+};
+
+  db.estoqueMedicamentos.push(novoMed);
+  registrarLog(db, "admin", "admin", `Cadastrou o medicamento ${novoMed.nome} (ID: ${novoMed.id}, Lote: ${novoMed.lote})`);
+  await writeDB(db);
+
+  res.json({ message: "Medicamento cadastrado com sucesso!", medicamento: novoMed });
+});
+// consulta 
+app.post("/consulta", async (req, res) => {
+  try {
+    const db = await readDB(); // Sua função para ler o db.json
+    const { triagemId, pacienteId, paciente, diagnostico, medicacao, obs } = req.body;
+
+    // 1. Salva os dados da consulta para a farmácia/prontuário
+    if (!db.consultas) db.consultas = [];
+    db.consultas.push({
+      id: Date.now(),
+      pacienteId,
+      paciente,
+      diagnostico,
+      medicacao,
+      obs,
+      data: new Date().toISOString()
+    });
+
+    // 2. Atualiza o status do paciente na fila para ele NÃO aparecer mais no painel médico
+    if (triagemId && db.triagens) {
+      const index = db.triagens.findIndex(t => Number(t.id) === Number(triagemId));
+      if (index !== -1) {
+        db.triagens[index].status = "finalizado";
+      }
+    }
+
+    // 3. Registra nos logs
+    if (!db.logs) db.logs = [];
+    db.logs.unshift({
+      timestamp: new Date().toISOString(),
+      user: "Médico",
+      role: "medico",
+      message: `Consulta finalizada: ${paciente}`
+    });
+
+    await writeDB(db); // Sua função para salvar o db.json
+    res.json({ message: "Consulta finalizada com sucesso!" });
+
+  } catch (error) {
+    console.error("Erro ao salvar consulta:", error);
+    res.status(500).json({ erro: "Erro interno no servidor." });
+  }
 });
 
 // REGISTRO DE ALTA MÉDICA
