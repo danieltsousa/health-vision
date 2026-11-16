@@ -24,15 +24,229 @@
       "usuario": "admin",
       "senha": "123",
       "tipo": "admin"
+    },
+    {
+      "usuario": "alm",
+      "senha": "123",
+      "tipo": "almoxarife"
+    }
+  ],
+  "logs": [
+    {
+      "timestamp": "2026-11-16T14:37:46.416Z",
+      "user": "alm",
+      "role": "almoxarife",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-11-16T14:04:50.972Z",
+      "user": "far",
+      "role": "farmacia",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-10-20T13:18:23.186Z",
+      "user": "admin",
+      "role": "admin",
+      "message": "Cadastrou o medicamento Dapflow (ID: 1792502303186, Lote: L2026-F)"
+    },
+    {
+      "timestamp": "2026-10-20T13:13:28.687Z",
+      "user": "far",
+      "role": "farmacia",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-10-20T13:12:46.480Z",
+      "user": "admin",
+      "role": "admin",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-10-20T13:12:09.480Z",
+      "user": "enfermagem",
+      "role": "triagem",
+      "message": "Realizou triagem do paciente: CELSO PORTIOLI (Risco: amarelo)"
+    },
+    {
+      "timestamp": "2026-10-20T13:10:27.096Z",
+      "user": "enf",
+      "role": "triagem",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-10-20T13:07:50.497Z",
+      "user": "med",
+      "role": "medico",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-10-20T13:07:28.591Z",
+      "user": "enfermagem",
+      "role": "triagem",
+      "message": "Realizou triagem do paciente: JULIO VERNE (Risco: amarelo)"
+    },
+    {
+      "timestamp": "2026-10-20T13:06:22.391Z",
+      "user": "enfermagem",
+      "role": "triagem",
+      "message": "Realizou triagem do paciente: CELSO PORTIOLI (Risco: amarelo)"
+    },
+    {
+      "timestamp": "2026-10-20T13:02:51.440Z",
+      "user": "enf",
+      "role": "triagem",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-10-20T13:01:45.204Z",
+      "user": "recepcao",
+      "role": "atendimento",
+      "message": "Cadastrou novo paciente: JULIO VERNE"
+    },
+    {
+      "timestamp": "2026-10-20T13:00:04.121Z",
+      "user": "recepcao",
+      "role": "atendimento",
+      "message": "Cadastrou novo paciente: CELSO PORTIOLI"
+    },
+    {
+      "timestamp": "2026-10-20T12:58:59.020Z",
+      "user": "rec",
+      "role": "atendimento",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-10-20T12:58:19.962Z",
+      "user": "enf",
+      "role": "triagem",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-10-19T15:18:13.909Z",
+      "user": "enfermagem",
+      "role": "triagem",
+      "message": "Realizou triagem do paciente: felipe moura (Risco: amarelo)"
+    },
+    {
+      "timestamp": "2026-10-19T15:16:51.126Z",
+      "user": "enf",
+      "role": "triagem",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-10-19T14:52:00.235Z",
+      "user": "enfermagem",
+      "role": "triagem",
+      "message": "Realizou triagem do paciente: Danny Glover (Risco: amarelo)"
+    },
+    {
+      "timestamp": "2026-10-19T14:50:29.402Z",
+      "user": "enf",
+      "role": "triagem",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-10-19T14:09:52.363Z",
+      "user": "enf",
+      "role": "triagem",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-10-19T14:04:49.303Z",
+      "user": "med",
+      "role": "medico",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-09-28T15:20:09.399Z",
+      "user": "med",
+      "role": "medico",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-09-28T15:17:29.646Z",
+      "user": "med",
+      "role": "medico",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-09-28T15:10:59.005Z",
+      "user": "med",
+      "role": "medico",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-09-28T15:02:35.670Z",
+      "user": "admin",
+      "role": "admin",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-09-28T15:01:16.612Z",
+      "user": "med",
+      "role": "medico",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-09-28T15:00:32.676Z",
+      "user": "admin",
+      "role": "admin",
+      "message": "Cadastrou o medicamento morfinex (ID: 1790607632676, Lote: 45609-7)"
+    },
+    {
+      "timestamp": "2026-09-28T14:53:02.844Z",
+      "user": "med",
+      "role": "medico",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-09-28T14:51:59.461Z",
+      "user": "admin",
+      "role": "admin",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-09-28T14:48:28.899Z",
+      "user": "admin",
+      "role": "admin",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-09-28T14:18:18.918Z",
+      "user": "far",
+      "role": "farmacia",
+      "message": "Efetuou login no sistema"
+    },
+    {
+      "timestamp": "2026-09-28T14:07:43.721Z",
+      "user": "med",
+      "role": "medico",
+      "message": "Efetuou login no sistema"
     }
   ],
   "leitosUTI": [
-    { "id": 1, "nome": "Leito UTI 01", "status": "livre" },
-    { "id": 2, "nome": "Leito UTI 02", "status": "livre" },
-    { "id": 3, "nome": "Leito UTI 03", "status": "livre" },
-    { "id": 4, "nome": "Leito UTI 04", "status": "livre" }
+    {
+      "id": 1,
+      "nome": "Leito UTI 01",
+      "status": "livre"
+    },
+    {
+      "id": 2,
+      "nome": "Leito UTI 02",
+      "status": "livre"
+    },
+    {
+      "id": 3,
+      "nome": "Leito UTI 03",
+      "status": "livre"
+    },
+    {
+      "id": 4,
+      "nome": "Leito UTI 04",
+      "status": "livre"
+    }
   ],
-  "logs": [],
   "pacientes": [
     {
       "id": 1778843781579,
@@ -57,6 +271,32 @@
       "tipo": "SUS",
       "status": "triagem",
       "createdAt": "2026-08-31T14:39:23.949Z"
+    },
+    {
+      "id": 1792501204121,
+      "nome": "CELSO PORTIOLI",
+      "cpf": "44566789923",
+      "dataNascimento": "1999-09-09",
+      "genero": "Masculino",
+      "nomeMae": "JOSILEIA ALVES",
+      "tipoAtendimento": "SUS",
+      "foto": null,
+      "responsavel": null,
+      "status": "triagem",
+      "createdAt": "2026-10-20T13:00:04.121Z"
+    },
+    {
+      "id": 1792501305204,
+      "nome": "JULIO VERNE",
+      "cpf": "55677899012",
+      "dataNascimento": "1967-09-25",
+      "genero": "Masculino",
+      "nomeMae": "GIULIANA",
+      "tipoAtendimento": "Convenio",
+      "foto": null,
+      "responsavel": null,
+      "status": "triagem",
+      "createdAt": "2026-10-20T13:01:45.204Z"
     }
   ],
   "triagens": [
@@ -103,27 +343,109 @@
       "risco": "amarelo",
       "status": "aguardando_medico",
       "createdAt": "2026-08-31T14:47:42.740Z"
+    },
+    {
+      "id": 1792421520235,
+      "pacienteId": 1788186446893,
+      "nome": "Danny Glover",
+      "sintoma": "vomito_diarreia, calafrios",
+      "temperatura": 38.5,
+      "alergia": "nenhuma",
+      "observacao": "Nenhuma",
+      "risco": "amarelo",
+      "status": "aguardando_medico",
+      "createdAt": "2026-10-19T14:52:00.235Z"
+    },
+    {
+      "id": 1792423093909,
+      "pacienteId": 1788187163949,
+      "nome": "felipe moura",
+      "sintoma": "dor_leve, calafrios",
+      "temperatura": 38.5,
+      "alergia": "nenhuma",
+      "observacao": "Nenhuma",
+      "risco": "amarelo",
+      "status": "aguardando_medico",
+      "createdAt": "2026-10-19T15:18:13.909Z"
+    },
+    {
+      "id": 1792501582391,
+      "pacienteId": 1792501204121,
+      "nome": "CELSO PORTIOLI",
+      "sintoma": "dor_leve, falta_ar_moderada",
+      "temperatura": 37,
+      "alergia": "torsilax",
+      "observacao": "Hematoma pequeno no ombro",
+      "risco": "amarelo",
+      "status": "aguardando_medico",
+      "createdAt": "2026-10-20T13:06:22.391Z"
+    },
+    {
+      "id": 1792501648591,
+      "pacienteId": 1792501305204,
+      "nome": "JULIO VERNE",
+      "sintoma": "vomito_diarreia",
+      "temperatura": 38,
+      "alergia": "nenhuma",
+      "observacao": "Sudorese Excessiva",
+      "risco": "amarelo",
+      "status": "aguardando_medico",
+      "createdAt": "2026-10-20T13:07:28.591Z"
+    },
+    {
+      "id": 1792501929480,
+      "pacienteId": 1792501204121,
+      "nome": "CELSO PORTIOLI",
+      "sintoma": "febre, falta_ar_moderada, teve covid 19  um ano atras ",
+      "temperatura": 37.5,
+      "alergia": "ibuprofeno",
+      "observacao": "Nervoso",
+      "risco": "amarelo",
+      "status": "aguardando_medico",
+      "createdAt": "2026-10-20T13:12:09.480Z"
     }
   ],
   "consultas": [
+    {},
     {
       "id": 1789399316575,
       "pacienteId": 1776857571101,
       "paciente": "Emily",
       "diagnostico": "Gripe",
       "medicacao": "Ibuprofeno",
-      "obs": "[Triagem]: Dor ocular forte\n\n[Conduta Médica]: apresenta necessidade de recuperação",
+      "obs": "[Triagem]: Dor ocular forte\n\n[Conduta Médica]:  apresenta necessidade de recuperação",
       "createdAt": "2026-09-14T15:21:56.575Z"
     }
   ],
   "tv_chamada": {
-    "id": "1788962330893",
+    "id": "1792501769848",
     "localTipo": "CONSULTÓRIO",
     "localNumero": "01",
-    "paciente": "fabio duarte ",
-    "hora": "10:58"
+    "paciente": "JULIO VERNE",
+    "hora": "10:09"
   },
   "tv_historico": [
+    {
+      "id": "1792501769848",
+      "localTipo": "CONSULTÓRIO",
+      "localNumero": "01",
+      "paciente": "JULIO VERNE",
+      "hora": "10:09"
+    },
+    {
+      "id": "1792419279998",
+      "localTipo": "TRIAGEM",
+      "localNumero": "01",
+      "paciente": "Adriana",
+      "hora": "11:14"
+    },
+    {
+      "id": "1790607233230",
+      "localTipo": "CONSULTÓRIO",
+      "localNumero": "01",
+      "paciente": "fabio duarte ",
+      "hora": "11:53"
+    },
     {
       "id": "1788962330893",
       "localTipo": "CONSULTÓRIO",
@@ -137,27 +459,31 @@
       "localNumero": "01",
       "paciente": "Yan",
       "hora": "10:58"
+    }
+  ],
+  "altas": [],
+  "estoqueMedicamentos": [
+    {
+      "id": 1790607632676,
+      "nome": "morfinex",
+      "principioAtivo": "morfina",
+      "apresentacao": "oral",
+      "lote": "45609-7",
+      "validade": "2028-04-29",
+      "quantidade": 16,
+      "controleEspecial": true,
+      "portaria344": "C1 (Outros Controlados)"
     },
     {
-      "id": "1788962314270",
-      "localTipo": "CONSULTÓRIO",
-      "localNumero": "01",
-      "paciente": "Emily",
-      "hora": "10:58"
-    },
-    {
-      "id": "1788962304645",
-      "localTipo": "CONSULTÓRIO",
-      "localNumero": "01",
-      "paciente": "Emily",
-      "hora": "10:58"
-    },
-    {
-      "id": "1788962288053",
-      "localTipo": "CONSULTÓRIO",
-      "localNumero": "01",
-      "paciente": "Emily",
-      "hora": "10:58"
+      "id": 1792502303186,
+      "nome": "Dapflow",
+      "principioAtivo": "dapaglifozina 10mg",
+      "apresentacao": "comprimido ",
+      "lote": "L2026-F",
+      "validade": "2029-05-15",
+      "quantidade": 23,
+      "controleEspecial": false,
+      "portaria344": "Não se aplica"
     }
   ]
 }
