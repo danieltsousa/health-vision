@@ -2,165 +2,183 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Farmácia - HealthVision</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>Farmácia Hospitalar - Rastreabilidade & Dispensação</title>
   <style>
-    /* Estilos complementares de otimização */
-    .header-farmacia {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .filtros-container {
-      display: flex;
-      gap: 8px;
-    }
-    .btn-filtro {
-      background: #e2e8f0;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-      color: #4a5568;
-      transition: background 0.2s;
-    }
-    .btn-filtro.ativo {
-      background: #3182ce;
-      color: white;
-    }
-    .tile-white {
-      background: #ffffff;
-      padding: 16px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      transition: transform 0.2s;
-    }
-    .tile-white:hover {
-      transform: translateY(-2px);
-    }
-    .loading-text, .error-text {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 20px;
-      font-weight: bold;
-      color: #718096;
-    }
-    .error-text { color: #e53e3e; }
+    body { font-family: Arial, sans-serif; background: #f4f6f8; padding: 20px; }
+    .container { max-width: 1100px; margin: auto; }
+    .card-estoque { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 25px; }
+    .badge-psico { background: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+    .badge-comum { background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; }
+    th { background: #014227; color: white; }
+    .alerta-validade { color: #d97706; font-weight: bold; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px; }
+    input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
+    button { background: #014227; color: white; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 4px; }
+    button:hover { background: #025b36; }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>💊 Farmácia - Visão Técnica & Controle Especial</h1>
 
-  <main class="container conteudo-principal">
-    <div class="header-farmacia">
-      <h1>💊 Dispensa de Medicamentos</h1>
-      <div class="filtros-container">
-        <button class="btn-filtro ativo" onclick="mudarFiltro('todos', this)">Todas</button>
-        <button class="btn-filtro" onclick="mudarFiltro('pendente', this)">Pendentes</button>
-        <button class="btn-filtro" onclick="mudarFiltro('entregue', this)">Entregues</button>
+    <!-- Formulário para Adicionar Novo Remédio -->
+    <div class="card-estoque">
+      <h3> Cadastrar Novo Medicamento / Lote</h3>
+      <form id="form-novo-med" onsubmit="cadastrarMedicamento(event)">
+        <div class="form-grid">
+          <div>
+            <label>Nome Comercial:</label>
+            <input type="text" id="med-nome" placeholder="Ex: Dipirona 500mg" required>
+          </div>
+          <div>
+            <label>Princípio Ativo (Composição):</label>
+            <input type="text" id="med-principio" placeholder="Ex: Dipirona Sódica" required>
+          </div>
+          <div>
+            <label>Apresentação:</label>
+            <input type="text" id="med-apresentacao" placeholder="Ex: Comprimido, Ampola 2ml" required>
+          </div>
+          <div>
+            <label>Lote:</label>
+            <input type="text" id="med-lote" placeholder="Ex: L2026-A" required>
+          </div>
+          <div>
+            <label>Validade:</label>
+            <input type="date" id="med-validade" required>
+          </div>
+          <div>
+            <label>Quantidade:</label>
+            <input type="number" id="med-qtd" placeholder="Qtd" required>
+          </div>
+          <div>
+            <label>Controle Especial:</label>
+            <select id="med-portaria">
+              <option value="Não se aplica">Não (Uso Geral)</option>
+              <option value="A1 (Entorpecente)">A1 (Entorpecente)</option>
+              <option value="B1 (Psicotrópico)">B1 (Psicotrópico)</option>
+              <option value="C1 (Outros Controlados)">C1 (Outros)</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit">Salvar Medicamento no Estoque</button>
+      </form>
+    </div>
+
+    <!-- Busca de Alternativa Terapêutica -->
+    <div class="card-estoque">
+      <h3>🔍 Substituição de Medicamento (Alternativa Terapêutica)</h3>
+      <p style="font-size: 0.9rem; color: #555;">Busque por Princípio Ativo para localizar similares ou genéricos disponíveis:</p>
+      <div style="display: flex; gap: 10px;">
+        <input type="text" id="busca-principio" placeholder="Digite o princípio ativo..." style="flex: 1; padding: 10px;">
+        <button type="button" onclick="buscarAlternativas()">Pesquisar</button>
       </div>
+      <div id="resultado-alternativas" style="margin-top: 15px;"></div>
     </div>
 
-    <div class="tiles-grid" id="lista-prescricoes">
-      <div class="loading-text">Carregando prescrições...</div>
+    <!-- Tabela Geral de Estoque -->
+    <div class="card-estoque">
+      <h3> Rastreabilidade de Estoque, Lotes e Validade</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Medicamento / Princípio Ativo</th>
+            <th>Apresentação</th>
+            <th>Lote</th>
+            <th>Validade</th>
+            <th>Qtd Disp.</th>
+            <th>Tipo / Portaria 344</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-estoque"></tbody>
+      </table>
     </div>
-  </main>
-
-  <footer class="rodape-sistema">
-    <div class="rodape-conteudo">
-      <img src="img/healthvision-logo.png" alt="HealthVision Logo" class="logo-rodape">
-      <span class="rodape-texto">© 2026 HealthVision Hospitalar</span>
-    </div>
-  </footer>
+  </div>
 
   <script>
-    let dadosGlobais = [];
-    let filtroAtual = 'todos';
+    async function carregarEstoqueFarmacia() {
+      const res = await fetch("/api/farmacia/estoque");
+      const medicamentos = await res.json();
+      const tbody = document.getElementById("tabela-estoque");
+      tbody.innerHTML = "";
 
-    function mudarFiltro(tipo, elemento) {
-      document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('ativo'));
-      elemento.classList.add('ativo');
-      filtroAtual = tipo;
-      renderizarPrescricoes();
-    }
-
-    function carregarPrescricoes() {
-      fetch("/farmacia/prescricoes")
-        .then(r => {
-          if (!r.ok) throw new Error("Erro ao buscar dados do servidor");
-          return r.json();
-        })
-        .then(data => {
-          dadosGlobais = data || [];
-          renderizarPrescricoes();
-        })
-        .catch(err => {
-          console.error(err);
-          const div = document.getElementById("lista-prescricoes");
-          div.innerHTML = `<div class="error-text">⚠️ Não foi possível carregar as prescrições no momento.</div>`;
-        });
-    }
-
-    function renderizarPrescricoes() {
-      const div = document.getElementById("lista-prescricoes");
-      div.innerHTML = "";
-
-      // Filtra os dados de acordo com o botão selecionado
-      const dadosFiltrados = dadosGlobais.filter(p => {
-        const entregue = p.statusMedicacao === "ENTREGUE";
-        if (filtroAtual === 'pendente') return !entregue;
-        if (filtroAtual === 'entregue') return entregue;
-        return true;
-      });
-
-      if (dadosFiltrados.length === 0) {
-        div.innerHTML = `<p style='color:#7a7029; grid-column: 1/-1; text-align:center;'>Nenhuma prescrição encontrada para este filtro.</p>`;
-        return;
-      }
-
-      dadosFiltrados.forEach(p => {
-        const entregue = p.statusMedicacao === "ENTREGUE";
-        div.innerHTML += `
-          <div class="tile tile-white" style="border-left: 5px solid ${entregue ? '#28a745' : '#7a7029'};">
-            <h3>Paciente: ${p.paciente}</h3>
-            <p style="margin: 6px 0;"><b>Medicação:</b> ${p.medicacao}</p>
-            <p style="margin: 6px 0;"><b>Observações:</b> ${p.obs || 'Sem observações'}</p>
-            <p style="margin: 6px 0;"><b>Status:</b> ${entregue ? '✅ Entregue' : '⏳ Pendente'}</p>
-            ${!entregue ? `<button class="tile tile-button tile-green" style="min-height: 40px; margin-top: 12px; width: 100%;" onclick="entregar(${p.id})">Confirmar Entrega</button>` : ''}
-          </div>
+      medicamentos.forEach(med => {
+        const ehControlado = med.controleEspecial;
+        
+        tbody.innerHTML += `
+          <tr>
+            <td><code>#${med.id}</code></td>
+            <td>
+              <b>${med.nome}</b><br>
+              <small style="color: #666;">Composição: ${med.principioAtivo}</small>
+            </td>
+            <td>${med.apresentacao}</td>
+            <td><code>${med.lote}</code></td>
+            <td><span class="alerta-validade">${med.validade}</span></td>
+            <td><b>${med.quantidade}</b> un.</td>
+            <td>
+              ${ehControlado ? 
+                `<span class="badge-psico"> CONTROLADO (${med.portaria344})</span>` : 
+                `<span class="badge-comum">Geral</span>`
+              }
+            </td>
+          </tr>
         `;
       });
     }
 
-    function entregar(id) {
-      if (!confirm("Deseja confirmar a entrega desta medicação?")) return;
+    async function cadastrarMedicamento(e) {
+      e.preventDefault();
+      const payload = {
+        nome: document.getElementById("med-nome").value,
+        principioAtivo: document.getElementById("med-principio").value,
+        apresentacao: document.getElementById("med-apresentacao").value,
+        lote: document.getElementById("med-lote").value,
+        validade: document.getElementById("med-validade").value,
+        quantidade: document.getElementById("med-qtd").value,
+        controleEspecial: document.getElementById("med-portaria").value !== "Não se aplica",
+        portaria344: document.getElementById("med-portaria").value
+      };
 
-      fetch("/farmacia/entregar", {
+      const res = await fetch("/api/admin/farmacia/medicamento", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id })
-      })
-      .then(r => {
-        if (!r.ok) throw new Error("Erro ao processar entrega");
-        return r.json();
-      })
-      .then(() => {
-        alert("✅ Medicação entregue com sucesso!");
-        carregarPrescricoes();
-      })
-      .catch(err => {
-        alert("❌ Erro ao registrar entrega. Tente novamente.");
-        console.error(err);
+        body: JSON.stringify(payload)
       });
+
+      if (res.ok) {
+        alert("✅ Medicamento cadastrado com sucesso!");
+        document.getElementById("form-novo-med").reset();
+        carregarEstoqueFarmacia();
+      } else {
+        alert("❌ Erro ao cadastrar medicamento.");
+      }
     }
 
-    // Inicialização e atualização automática a cada 5 segundos
-    carregarPrescricoes();
-    setInterval(carregarPrescricoes, 5000);
+    async function buscarAlternativas() {
+      const principio = document.getElementById("busca-principio").value;
+      if (!principio) return;
+
+      const res = await fetch(`/api/farmacia/alternativas?principioAtivo=${encodeURIComponent(principio)}`);
+      const itens = await res.json();
+      const div = document.getElementById("resultado-alternativas");
+
+      if (itens.length === 0) {
+        div.innerHTML = "<p style='color: #b42318;'>Nenhum medicamento alternativo disponível.</p>";
+        return;
+      }
+
+      let html = "<h4>Alternativas Encontradas:</h4><ul>";
+      itens.forEach(i => {
+        html += `<li><b>${i.nome}</b> (${i.apresentacao}) - Lote: ${i.lote} - <b>Saldo: ${i.quantidade} un.</b></li>`;
+      });
+      html += "</ul>";
+      div.innerHTML = html;
+    }
+
+    carregarEstoqueFarmacia();
   </script>
 </body>
 </html>
