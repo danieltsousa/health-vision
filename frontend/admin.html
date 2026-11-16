@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="css/style.css">
   
   <style>
-    /* Estilos atualizados que preparamos */
     :root {
       --primary-color: #014227;
       --primary-hover: #025b36;
@@ -16,6 +15,9 @@
       --border-color: #e7ded5;
       --text-primary: #222222;
       --text-secondary: #6b625b;
+      --danger-color: #b42318;
+      --danger-hover: #911c13;
+      --warning-color: #e0a800;
     }
 
     body {
@@ -23,12 +25,18 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
+      color: var(--text-primary);
+    }
+
+    h1, h2, h3 {
+      color: var(--primary-color);
     }
 
     .admin-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 24px;
+      margin-top: 20px;
     }
 
     .card {
@@ -37,12 +45,14 @@
       border: 1px solid var(--border-color);
       border-radius: 4px;
       box-shadow: 0 12px 35px rgba(1, 66, 39, 0.08);
+      margin-bottom: 24px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 14px;
+      background-color: var(--card-bg);
     }
 
     th, td {
@@ -57,18 +67,143 @@
       color: var(--primary-color);
       font-weight: bold;
     }
+
+    tr:nth-child(even) {
+      background-color: #faf6f2;
+    }
+
+    .btn-primary, .btn-danger, .btn-warning {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      border: 0;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-primary { background-color: var(--primary-color); color: #ffffff; }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+
+    .btn-danger { background-color: var(--danger-color); color: #ffffff; }
+    .btn-danger:hover { background-color: var(--danger-hover); }
+
+    .log-box {
+      font-family: 'Courier New', Courier, monospace;
+      background: #0f1914;
+      color: #4ade80;
+      padding: 14px;
+      height: 250px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    input, select {
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(1, 66, 39, 0.1);
+    }
   </style>
 </head>
 <body>
 
-  <h1>Painel do Administrador</h1>
+  <main class="container">
+    <h1>🛡️ Painel do Administrador</h1>
+    <p>Gerenciamento geral do sistema hospitalar HealthVision.</p>
 
-  <div class="admin-grid">
-    
-    <!-- CARD ONDE FICA A TABELA DE LOGS -->
+    <!-- GRID PRINCIPAL DE CONFIGURAÇÕES E LEITOS/FARMÁCIA -->
+    <div class="admin-grid">
+      
+      <!-- CARD: Cadastro de Leitos UTI -->
+      <div class="card">
+        <h3>🛏️ Cadastro de Leitos UTI</h3>
+        <form id="form-leito">
+          <div class="form-group">
+            <label for="leito-nome">Nome do Leito</label>
+            <input type="text" id="leito-nome" placeholder="Ex: Leito UTI 05" required>
+          </div>
+          <div class="form-group">
+            <label for="leito-setor">Setor</label>
+            <input type="text" id="leito-setor" placeholder="Ex: Geral, Cardiológico">
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; margin-top: 5px;">Cadastrar Leito</button>
+        </form>
+        <div id="lista-leitos-admin" style="max-height: 150px; overflow-y: auto; margin-top: 15px;"></div>
+      </div>
+
+      <!-- CARD: Entrada de Medicamentos (Farmácia) -->
+      <div class="card">
+        <h3>💊 Estoque e Farmácia</h3>
+        <form id="form-medicamento">
+          <div class="form-group">
+            <label for="med-nome">Nome Comercial</label>
+            <input type="text" id="med-nome" placeholder="Ex: Dipirona 500mg" required>
+          </div>
+          <div class="form-group">
+            <label for="med-principio">Princípio Ativo</label>
+            <input type="text" id="med-principio" placeholder="Ex: Dipirona Sódica">
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+              <label for="med-lote">Lote</label>
+              <input type="text" id="med-lote" placeholder="Lote" required>
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label for="med-validade">Validade</label>
+              <input type="date" id="med-validade" required>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="width: 90px;">
+              <label for="med-qtd">Qtd</label>
+              <input type="number" id="med-qtd" placeholder="Qtd" required>
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label for="med-portaria">Controle Especial</label>
+              <select id="med-portaria">
+                <option value="Não se aplica">Uso Geral</option>
+                <option value="A1 (Entorpecente)">A1 (Entorpecente)</option>
+                <option value="B1 (Psicotrópico)">B1 (Psicotrópico)</option>
+                <option value="C1 (Outros Controlados)">C1 (Outros)</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; margin-top: 5px;">Adicionar Medicamento</button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- CARD: Logs de Auditoria em Tempo Real -->
     <div class="card">
-      <h3>Logs de Auditoria em Tempo Real</h3>
-      <p>Ações registradas pelos usuários no sistema.</p>
+      <h3>📋 Logs de Auditoria em Tempo Real</h3>
+      <p>Histórico das últimas ações executadas no sistema.</p>
 
       <table>
         <thead>
@@ -76,41 +211,40 @@
             <th>Data/Hora</th>
             <th>Usuário</th>
             <th>Perfil</th>
-            <th>Ação</th>
+            <th>Ação / Descrição</th>
           </tr>
         </thead>
-        <!-- O id é capturado pelo document.getElementById -->
         <tbody id="tabela-logs-body">
           <tr>
-            <td colspan="4" style="text-align: center; color: #6b625b;">Carregando logs...</td>
+            <td colspan="4" style="text-align: center; color: var(--text-secondary);">Carregando logs...</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-  </div>
+  </main>
 
-  <!-- SCRIPT QUE ATUALIZA A TABELA VIA ID -->
+  <!-- SCRIPT DE INTEGRAÇÃO E EVENT LISTENERS -->
   <script>
+    // 1. Função para carregar e atualizar a tabela de logs via ID
     async function carregarLogs() {
-      // Captura a tag <tbody> pelo ID do HTML
       const tbody = document.getElementById("tabela-logs-body");
 
-      try {
-        const response = await fetch("/api/logs");
-        if (!response.ok) throw new Error("Erro ao carregar logs");
-
-        const logs = await response.json();
+  try {
+    // 💥 CORREÇÃO: Altere a URL dentro do fetch para buscar exatamente em '/api/logs'
+    const response = await fetch('/api/logs'); 
+    
+    if (!response.ok) throw new Error('Erro ao buscar logs');
+    const logs = await response.json();
 
         if (!logs || logs.length === 0) {
           tbody.innerHTML = `
             <tr>
-              <td colspan="4" style="text-align: center;">Nenhum log registrado.</td>
+              <td colspan="4" style="text-align: center;">Nenhum registro de log encontrado.</td>
             </tr>`;
           return;
         }
 
-        // Insere as linhas dentro do espaço da tabela no HTML
         tbody.innerHTML = logs.map(log => {
           const dataFormatada = new Date(log.timestamp).toLocaleString("pt-BR");
           return `
@@ -124,20 +258,97 @@
         }).join("");
 
       } catch (error) {
-        console.error(error);
+        console.error("Erro na atualização dos logs:", error);
         tbody.innerHTML = `
           <tr>
-            <td colspan="4" style="text-align: center; color: #b42318;">Erro ao buscar dados.</td>
+            <td colspan="4" style="text-align: center; color: var(--danger-color);">Erro ao carregar os logs do sistema.</td>
           </tr>`;
       }
     }
 
-    // Executa assim que a página abre
-    document.addEventListener("DOMContentLoaded", carregarLogs);
+    // 2. Event Listener para Cadastrar Leito
+    document.getElementById("form-leito").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nome = document.getElementById("leito-nome").value;
+      const setor = document.getElementById("leito-setor").value;
 
-    // Atualiza o espacinho da tabela a cada 3 segundos
+      const res = await fetch("/admin/leitos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome, setor })
+      });
+
+      if (res.ok) {
+        alert("✅ Leito cadastrado com sucesso!");
+        document.getElementById("form-leito").reset();
+        carregarLeitosAdmin();
+      } else {
+        alert("❌ Erro ao cadastrar leito.");
+      }
+    });
+
+    // 3. Event Listener para Cadastrar Medicamento na Farmácia
+    document.getElementById("form-medicamento").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = {
+        nome: document.getElementById("med-nome").value,
+        principioAtivo: document.getElementById("med-principio").value,
+        apresentacao: "Comprimido/Ampola",
+        lote: document.getElementById("med-lote").value,
+        validade: document.getElementById("med-validade").value,
+        quantidade: document.getElementById("med-qtd").value,
+        controleEspecial: document.getElementById("med-portaria").value !== "Não se aplica",
+        portaria344: document.getElementById("med-portaria").value
+      };
+
+      const res = await fetch("/admin/farmacia/medicamento", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        alert("✅ Medicamento registrado no estoque da farmácia!");
+        document.getElementById("form-medicamento").reset();
+      } else {
+        alert("❌ Erro ao registrar medicamento.");
+      }
+    });
+
+    // 4. Carregar Listagem de Leitos na Tela do Admin
+    async function carregarLeitosAdmin() {
+      const res = await fetch("/admin/leitos");
+      const leitos = await res.json();
+      const container = document.getElementById("lista-leitos-admin");
+      
+      if (!leitos.length) {
+        container.innerHTML = "<p style='font-size: 12px; color: #666;'>Nenhum leito cadastrado.</p>";
+        return;
+      }
+
+      container.innerHTML = leitos.map(l => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border-color); font-size: 13px;">
+          <span><b>${l.nome}</b> (${l.setor}) - <i style="color:${l.status === 'livre' ? 'green' : 'red'}">${l.status}</i></span>
+          ${l.status === 'livre' ? `<button onclick="deletarLeito(${l.id})" class="btn-danger" style="padding: 2px 8px; font-size: 11px;">Excluir</button>` : ''}
+        </div>
+      `).join("");
+    }
+
+    async function deletarLeito(id) {
+      if (confirm("Deseja remover este leito?")) {
+        await fetch(`/admin/leitos/${id}`, { method: "DELETE" });
+        carregarLeitosAdmin();
+      }
+    }
+
+    // Inicialização ao carregar a página
+    document.addEventListener("DOMContentLoaded", () => {
+      carregarLogs();
+      carregarLeitosAdmin();
+    });
+
+    // Atualiza a tabela de logs em tempo real a cada 3 segundos
     setInterval(carregarLogs, 3000);
   </script>
-
 </body>
 </html>
